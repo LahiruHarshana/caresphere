@@ -8,13 +8,27 @@ import { BookingsModule } from './bookings/bookings.module';
 import { MatchingModule } from './matching/matching.module';
 import { VaultModule } from './vault/vault.module';
 import { ChatModule } from './chat/chat.module';
+import { VideoModule } from './video/video.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CaregiversModule, BookingsModule, MatchingModule, VaultModule, ChatModule, PaymentsModule, AdminModule, InvoicesModule, NotificationsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    CaregiversModule,
+    BookingsModule,
+    MatchingModule,
+    VaultModule,
+    ChatModule,
+    VideoModule,
+    PaymentsModule,
+    AdminModule,
+    InvoicesModule,
+    NotificationsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
