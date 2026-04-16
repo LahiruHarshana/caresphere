@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  CAREGIVER
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum EarningStatus {
+  PENDING
+  PAID
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile          Profile?
+  caregiverProfile CaregiverProfile?
+  
+  // Relations
+  customerBookings Booking[] @relation("CustomerBookings")
+  caregiverBookings Booking[] @relation("CaregiverBookings")
+  
+  reviewsWritten   Review[] @relation("ReviewAuthor")
+  reviewsReceived  Review[] @relation("ReviewTarget")
+  
+  familyVaults     FamilyVault[]
+  
+  sentMessages     Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageReceiver")
+  
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+
+  @@index([role])
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  avatarUrl String?
+  bio       String?
+  phone     String?
+  address   String?
+  lat       Float?
+  lng       Float?
+  languages String[]
+
+  @@index([userId])
+  @@index([lat, lng])
+}
+
+model CaregiverProfile {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hourlyRate         Float
+  experienceYears    Int
+  certifications     String[]
+  specialties        String[]
+  verificationStatus VerificationStatus @default(PENDING)
+  backgroundCheckUrl String?
+  isAvailable        Boolean            @default(true)
+
+  @@index([userId])
+  @@index([verificationStatus])
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  customerId  String
+  customer    User          @relation("CustomerBookings", fields: [customerId], references: [id], onDelete: Cascade)
+  caregiverId String
+  caregiver   User          @relation("CaregiverBookings", fields: [caregiverId], references: [id], onDelete: Cascade)
+  serviceType String
+  scheduledAt DateTime
+  endAt       DateTime
+  status      BookingStatus @default(PENDING)
+  totalCost   Float?
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  reviews   Review[]
+  messages  Message[]
+  invoices  Invoice[]
+  earnings  Earning?
+
+  @@index([customerId])
+  @@index([caregiverId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetId  String
+  target    User     @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([bookingId])
+  @@index([authorId])
+  @@index([targetId])
+}
+
+model FamilyVault {
+  id                  String   @id @default(uuid())
+  customerId          String
+  customer            User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  encryptedData       String
+  iv                  String
+  allowedCaregiverIds String[]
+  expiresAt           DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([customerId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  bookingId  String?
+  booking    Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  content    String
+  readAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([bookingId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Invoice {
+  id        String        @id @default(uuid())
+  bookingId String
+  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount    Float
+  currency  String        @default("USD")
+  status    InvoiceStatus @default(PENDING)
+  pdfUrl    String?
+  issuedAt  DateTime      @default(now())
+  createdAt DateTime      @default(now())
+
+  @@index([bookingId])
+}
+
+model Earning {
+  id        String        @id @default(uuid())
+  bookingId String        @unique
+  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount    Float
+  status    EarningStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action     String
+  targetId   String?
+  targetType String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+}
