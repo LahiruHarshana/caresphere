@@ -1,7 +1,9 @@
 import { PrismaClient, Role, VerificationStatus, BookingStatus } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as argon2 from 'argon2';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg(process.env.DATABASE_URL || '');
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Seeding database...');
