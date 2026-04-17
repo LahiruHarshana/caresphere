@@ -24,13 +24,11 @@ export class CaregiversService {
     });
   }
 
-  async uploadVerification(userId: string): Promise<CaregiverProfile> {
-    // Dummy document upload endpoint that returns a mock URL and sets verificationStatus to PENDING
-    const dummyUrl = 'https://mock-url.com/verification-document.pdf';
+  async uploadVerification(userId: string, fileUrl: string): Promise<CaregiverProfile> {
     return this.prisma.caregiverProfile.update({
       where: { userId },
       data: {
-        backgroundCheckUrl: dummyUrl,
+        backgroundCheckUrl: fileUrl,
         verificationStatus: VerificationStatus.PENDING,
       },
     });

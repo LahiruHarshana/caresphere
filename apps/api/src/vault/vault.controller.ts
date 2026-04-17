@@ -8,27 +8,27 @@ export class VaultController {
   constructor(private vaultService: VaultService) {}
 
   @Post()
-  async createEntry(@Request() req, @Body('data') data: string) {
-    return this.vaultService.createVaultEntry(req.user.id, data);
+  async createEntry(@Request() req: any, @Body('data') data: string) {
+    return this.vaultService.createVaultEntry(req.user.userId, data);
   }
 
   @Get()
-  async listEntries(@Request() req) {
-    return this.vaultService.listVaultEntries(req.user.id);
+  async listEntries(@Request() req: any) {
+    return this.vaultService.listVaultEntries(req.user.userId);
   }
 
   @Get(':id')
-  async getEntry(@Request() req, @Param('id') id: string) {
-    return this.vaultService.getVaultEntry(id, req.user.id, req.user.role);
+  async getEntry(@Request() req: any, @Param('id') id: string) {
+    return this.vaultService.getVaultEntry(id, req.user.userId, req.user.role);
   }
 
   @Post(':id/grant')
-  async grantAccess(@Request() req, @Param('id') id: string, @Body('caregiverId') caregiverId: string) {
-    return this.vaultService.grantAccess(id, req.user.id, caregiverId);
+  async grantAccess(@Request() req: any, @Param('id') id: string, @Body('caregiverId') caregiverId: string) {
+    return this.vaultService.grantAccess(id, req.user.userId, caregiverId);
   }
 
-  @Delete(':id/revoke')
-  async revokeAccess(@Request() req, @Param('id') id: string, @Body('caregiverId') caregiverId: string) {
-    return this.vaultService.revokeAccess(id, req.user.id, caregiverId);
+  @Post(':id/revoke')
+  async revokeAccess(@Request() req: any, @Param('id') id: string, @Body('caregiverId') caregiverId: string) {
+    return this.vaultService.revokeAccess(id, req.user.userId, caregiverId);
   }
 }

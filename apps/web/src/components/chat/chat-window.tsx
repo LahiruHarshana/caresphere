@@ -12,8 +12,16 @@ interface ChatWindowProps {
   bookingId?: string;
 }
 
+interface Message {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt: string;
+}
+
 export const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, otherUser, token, bookingId }) => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const socket = useSocket('chat', token);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -23,7 +31,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, otherUser, 
 
     socket.emit('join-chat', { userId: currentUser.id, otherId: otherUser.id });
 
-    socket.on('receive-message', (message: any) => {
+    socket.on('receive-message', (message: Message) => {
       setMessages((prev) => [...prev, message]);
     });
 

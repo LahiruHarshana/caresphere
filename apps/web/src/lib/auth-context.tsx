@@ -13,6 +13,7 @@ type User = {
 
 type AuthContextType = {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
@@ -22,28 +23,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // Check if token exists in cookies
+    // Check if token exists in localStorage
+    const storedToken = localStorage.getItem("token");
     const checkAuth = async () => {
+      if (!storedToken) {
+        setIsLoading(false);
+        return;
+      }
       try {
         const res = await fetch("http://localhost:4000/auth/me", {
           headers: {
             "Content-Type": "application/json",
-            // Include credentials to send httpOnly cookies if configured, 
-            // but Next.js will likely handle it differently.
+            "Authorization": `Bearer ${storedToken}`,
           }
         });
         if (res.ok) {
           const data = await res.json();
           setUser(data);
+          setToken(storedToken);
         } else {
           setUser(null);
+          setToken(null);
+          localStorage.removeItem("token");
         }
-      } catch (error) {
+      } catch {
         setUser(null);
+        setToken(null);
       } finally {
         setIsLoading(false);
       }
@@ -51,9 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = (token: string, user: User) => {
-    // In a real app, token should be stored in httpOnly cookie via an API route.
-    // For now, we just set the state.
+  const login = (newToken: string, user: User) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
     setUser(user);
     if (user.role === "ADMIN") router.push("/admin/users");
     else if (user.role === "CAREGIVER") router.push("/gigs");
@@ -61,18 +71,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    // Call API to logout (blacklist token / clear cookie)
     try {
-      await fetch("http://localhost:4000/auth/logout", { method: "POST" });
+      await fetch("http://localhost:4000/auth/logout", { 
+        method: "POST",
+        headers: token ? { "Authorization": `Bearer ${token}` } : undefined
+      });
     } catch (e) {
       console.error("Logout failed", e);
     }
+    localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

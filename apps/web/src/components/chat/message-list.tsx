@@ -2,8 +2,20 @@
 
 import React, { useEffect, useRef } from 'react';
 
+interface Message {
+  id: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
+  sender?: {
+    profile?: {
+      firstName: string;
+    };
+  };
+}
+
 interface MessageListProps {
-  messages: any[];
+  messages: Message[];
   currentUserId: string;
 }
 

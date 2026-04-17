@@ -59,6 +59,57 @@ export class ChatService {
     });
   }
 
+  async getConversations(userId: string) {
+    const messages = await this.prisma.message.findMany({
+      where: {
+        OR: [{ senderId: userId }, { receiverId: userId }],
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const conversations = new Map();
+
+    for (const msg of messages) {
+      const otherUser = msg.senderId === userId ? msg.receiver : msg.sender;
+      if (!conversations.has(otherUser.id)) {
+        conversations.set(otherUser.id, {
+          otherUser,
+          lastMessage: msg,
+        });
+      }
+    }
+
+    return Array.from(conversations.values());
+  }
+
   async markAsRead(messageId: string) {
     return this.prisma.message.update({
       where: { id: messageId },
