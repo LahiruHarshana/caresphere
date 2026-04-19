@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,54 +8,56 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
-    let classes = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-    
-    switch(variant) {
+    let classes =
+      "inline-flex items-center justify-center whitespace-nowrap font-bold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
+    switch (variant) {
       case "default":
-        classes += " bg-primary text-white hover:opacity-90"
-        break
+        classes +=
+          " bg-primary text-white hover:bg-primary-600 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98]";
+        break;
       case "outline":
-        classes += " border border-input bg-background hover:bg-gray-100 hover:text-gray-900 text-primary border-primary/20"
-        break
+        classes +=
+          " border-2 border-input bg-background hover:bg-primary hover:text-white hover:border-primary active:scale-[0.98]";
+        break;
       case "destructive":
-        classes += " bg-red-500 text-white hover:bg-red-600"
-        break
+        classes +=
+          " bg-red-500 text-white hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98]";
+        break;
       case "ghost":
-        classes += " hover:bg-gray-100 hover:text-gray-900"
-        break
+        classes +=
+          " hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98]";
+        break;
       case "secondary":
-        classes += " bg-accent text-white hover:opacity-90"
-        break
+        classes +=
+          " bg-accent text-white hover:bg-accent-600 hover:shadow-lg hover:shadow-accent/30 active:scale-[0.98]";
+        break;
     }
 
-    switch(size) {
+    switch (size) {
       case "default":
-        classes += " h-10 px-4 py-2"
-        break
+        classes += " h-11 px-6 py-2.5 rounded-xl text-base";
+        break;
       case "sm":
-        classes += " h-9 rounded-md px-3"
-        break
+        classes += " h-9 px-4 rounded-lg text-sm";
+        break;
       case "lg":
-        classes += " h-11 rounded-md px-8"
-        break
+        classes += " h-14 px-10 rounded-2xl text-lg";
+        break;
       case "icon":
-        classes += " h-10 w-10"
-        break
+        classes += " h-11 w-11 rounded-xl";
+        break;
     }
 
     if (className) {
-        classes += ` ${className}`
+      classes += ` ${className}`;
     }
 
     return (
-      <button
-        className={classes}
-        ref={ref}
-        {...props}
-      />
-    )
+      <button className={classes} ref={ref} {...props} />
+    );
   }
-)
-Button.displayName = "Button"
+);
+Button.displayName = "Button";
 
-export { Button }
+export { Button };
