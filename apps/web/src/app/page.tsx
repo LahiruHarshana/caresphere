@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -14,7 +14,6 @@ import {
   Shield,
   Clock,
   Star,
-  ChevronDown,
   ArrowRight,
   Sparkles,
   Award,
@@ -171,7 +170,6 @@ const TestimonialCard = ({
 );
 
 export default function LandingPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
