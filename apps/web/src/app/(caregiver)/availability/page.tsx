@@ -1,118 +1,70 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
-
-type CaregiverProfile = {
-  id: string;
-  hourlyRate: number;
-  experienceYears: number;
-  certifications: string[];
-  specialties: string[];
-  isAvailable: boolean;
-};
+import { api } from "@/lib/api";
 
 export default function AvailabilityPage() {
-  const { token, isLoading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<CaregiverProfile | null>(null);
+  const { token } = useAuth();
+  const [isAvailable, setIsAvailable] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const fetchProfile = async () => {
-    if (!token) return;
-    try {
-      setLoading(true);
-      const res = await fetch("http://localhost:4000/caregivers/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProfile(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch profile", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    if (!authLoading) {
-      fetchProfile();
-    }
-  }, [token, authLoading]);
+    if (!token) return;
+    api.get("/caregivers/profile", token)
+      .then((data) => {
+        setIsAvailable(data.isAvailable);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [token]);
 
   const toggleAvailability = async () => {
-    if (!token || !profile) return;
     try {
-      setSaving(true);
-      const res = await fetch("http://localhost:4000/caregivers/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          hourlyRate: profile.hourlyRate,
-          experienceYears: profile.experienceYears,
-          certifications: profile.certifications,
-          specialties: profile.specialties,
-          isAvailable: !profile.isAvailable,
-        }),
-      });
-
-      if (res.ok) {
-        setProfile((prev) => prev ? { ...prev, isAvailable: !prev.isAvailable } : null);
-      } else {
-        console.error("Failed to update availability");
-      }
-    } catch (error) {
-      console.error("Error updating availability", error);
-    } finally {
-      setSaving(false);
+      const newStatus = !isAvailable;
+      await api.post("/caregivers/profile", { isAvailable: newStatus }, token);
+      setIsAvailable(newStatus);
+    } catch (err) {
+      console.error("Failed to update availability", err);
     }
   };
 
-  if (authLoading || loading) {
-    return <div className="p-8 text-center text-teal-700">Loading availability...</div>;
-  }
-
-  if (!profile) {
-    return <div className="p-8 text-center text-red-500">Failed to load profile. Please complete your profile first.</div>;
-  }
+  if (loading) return <div className="p-8">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-teal-700 mb-8">Manage Availability</h1>
-      
-      <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Current Status:{" "}
-          <span className={profile.isAvailable ? "text-teal-600" : "text-gray-500"}>
-            {profile.isAvailable ? "Available" : "Unavailable"}
-          </span>
-        </h2>
-        
-        <p className="text-gray-600 mb-8">
-          {profile.isAvailable 
-            ? "You are currently visible to customers and can receive new gig requests."
-            : "You are currently hidden from search and will not receive new gig requests."}
-        </p>
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Availability</h1>
 
-        <Button 
-          className={`w-full md:w-auto px-8 py-3 text-lg ${
-            profile.isAvailable 
-              ? "bg-gray-200 text-gray-800 hover:bg-gray-300" 
-              : "bg-teal-700 text-white hover:bg-teal-800"
-          }`}
-          onClick={toggleAvailability}
-          disabled={saving}
-        >
-          {saving ? "Updating..." : (profile.isAvailable ? "Set as Unavailable" : "Set as Available")}
-        </Button>
+      <div className="bg-white rounded-2xl shadow-sm border p-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isAvailable ? "You're Available" : "You're Unavailable"}
+            </h2>
+            <p className="text-gray-500 mt-1">
+              {isAvailable
+                ? "Customers can find and book you"
+                : "You won't appear in search results"}
+            </p>
+          </div>
+          <button
+            onClick={toggleAvailability}
+            className={`p-2 rounded-full transition-colors font-bold px-4 py-2 ${
+              isAvailable ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {isAvailable ? "Set Unavailable" : "Set Available"}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-8 bg-white rounded-2xl shadow-sm border p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Weekly Schedule</h2>
+        </div>
+        <p className="text-gray-500 text-sm">
+          Weekly schedule management coming soon. For now, use the toggle above to control your availability.
+        </p>
       </div>
     </div>
   );

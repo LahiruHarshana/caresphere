@@ -153,4 +153,10 @@ export class InvoicesService {
 
     return updatedInvoice;
   }
+
+  async getInvoice(id: string) {
+    return this.prisma.invoice.findUnique({
+      where: { id },
+    });
+  }
 }

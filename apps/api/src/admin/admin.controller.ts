@@ -44,4 +44,24 @@ export class AdminController {
   getAnalytics() {
     return this.adminService.getAnalytics();
   }
+
+  @Get('bookings')
+  getBookings(
+    @Query('status') status?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.adminService.getBookings(
+      status,
+      parseInt(page || '1'),
+      parseInt(limit || '20'),
+      search,
+    );
+  }
+
+  @Post('bookings/:id/cancel')
+  cancelBooking(@Param('id') id: string, @Req() req: any) {
+    return this.adminService.adminCancelBooking(id, req.user.userId);
+  }
 }

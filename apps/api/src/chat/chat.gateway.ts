@@ -23,14 +23,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  private connectedUsers = new Map<string, string>(); // userId -> socketId
+
   constructor(private chatService: ChatService) {}
 
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
+    const userId = client.handshake.auth.userId || client.data?.userId; 
+    if (userId) {
+      client.data.userId = userId;
+      this.connectedUsers.set(userId, client.id);
+      client.join(`user:${userId}`);
+      this.server.emit('user-online', userId);
+    }
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+    const userId = client.data?.userId;
+    if (userId) {
+      this.connectedUsers.delete(userId);
+      this.server.emit('user-offline', userId);
+    }
+  }
+
+  @SubscribeMessage('check-online')
+  handleCheckOnline(@MessageBody() data: { userId: string }) {
+    return this.connectedUsers.has(data.userId);
   }
 
   @SubscribeMessage('join-chat')
@@ -64,10 +83,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('typing')
   handleTyping(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { senderId: string; receiverId: string; isTyping: boolean },
+    @MessageBody() data: { receiverId: string; isTyping: boolean },
   ) {
-    const room = this.getRoomName(data.senderId, data.receiverId);
-    client.to(room).emit('typing', { userId: data.senderId, isTyping: data.isTyping });
+    this.server
+      .to(`user:${data.receiverId}`)
+      .emit('typing', { senderId: client.data.userId, isTyping: data.isTyping });
   }
 
   @SubscribeMessage('read-receipt')

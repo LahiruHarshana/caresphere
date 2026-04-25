@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ToastProvider } from "@/components/ui/toast";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -18,8 +20,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "CareSphere | Modern Caregiving Platform",
-  description: "Connect with trusted, compassionate caregivers. The modern platform for professional care with smart matching and real-time tracking.",
+  title: 'CareSphere — Trusted Caregiving Platform',
+  description: 'Find trusted, verified caregivers for your loved ones. Book professional elderly care, child care, and special needs services.',
+  keywords: 'caregiving, elderly care, child care, home care, caregivers',
   icons: {
     icon: [
       {
@@ -38,9 +41,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${plusJakarta.variable} ${outfit.variable} font-body antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ErrorBoundary>
+          <ToastProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </ToastProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

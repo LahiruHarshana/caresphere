@@ -49,6 +49,7 @@ model User {
 
   profile          Profile?
   caregiverProfile CaregiverProfile?
+  customerProfile  CustomerProfile?
   
   // Relations
   customerBookings Booking[] @relation("CustomerBookings")
@@ -81,9 +82,25 @@ model Profile {
   lat       Float?
   lng       Float?
   languages String[]
+  dateOfBirth DateTime?
 
   @@index([userId])
   @@index([lat, lng])
+}
+
+model CustomerProfile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  careType            String?
+  careFrequency       String?
+  specialRequirements String?
+  preferredSchedule   String?
+  emergencyContact    String?
+  emergencyPhone      String?
+  medicalNotes        String?
+
+  @@index([userId])
 }
 
 model CaregiverProfile {
@@ -97,6 +114,8 @@ model CaregiverProfile {
   verificationStatus VerificationStatus @default(PENDING)
   backgroundCheckUrl String?
   isAvailable        Boolean            @default(true)
+  agreedToBackgroundCheck Boolean       @default(false)
+  bio                String?
 
   @@index([userId])
   @@index([verificationStatus])
@@ -168,6 +187,7 @@ model Message {
   bookingId  String?
   booking    Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   content    String
+  deliveredAt DateTime?
   readAt     DateTime?
   createdAt  DateTime @default(now())
 
@@ -190,15 +210,16 @@ model Notification {
 }
 
 model Invoice {
-  id        String        @id @default(uuid())
-  bookingId String
-  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  amount    Float
-  currency  String        @default("USD")
-  status    InvoiceStatus @default(PENDING)
-  pdfUrl    String?
-  issuedAt  DateTime      @default(now())
-  createdAt DateTime      @default(now())
+  id                    String        @id @default(uuid())
+  bookingId             String
+  booking               Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount                Float
+  currency              String        @default("USD")
+  status                InvoiceStatus @default(PENDING)
+  pdfUrl                String?
+  stripePaymentIntentId String?
+  issuedAt              DateTime      @default(now())
+  createdAt             DateTime      @default(now())
 
   @@index([bookingId])
 }
@@ -227,4 +248,16 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@index([adminId])
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  type      String   // "EMAIL_VERIFY" | "PASSWORD_RESET"
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }

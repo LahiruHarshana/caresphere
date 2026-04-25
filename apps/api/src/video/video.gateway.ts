@@ -7,6 +7,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { PrismaService } from '../prisma/prisma.service';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -17,12 +19,29 @@ export class VideoGateway {
   @WebSocketServer()
   server: Server;
 
+  constructor(private readonly prisma: PrismaService) {}
+
   @SubscribeMessage('join-room')
-  handleJoinRoom(
+  async handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { bookingId: string },
+    @MessageBody() data: { bookingId: string; userId: string },
   ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: data.bookingId },
+    });
+
+    if (!booking || (booking.customerId !== data.userId && booking.caregiverId !== data.userId)) {
+      client.emit('error', 'Not authorized to join this call');
+      return;
+    }
+
+    if (booking.status !== 'IN_PROGRESS' && booking.status !== 'CONFIRMED') {
+      client.emit('error', 'Booking is not active');
+      return;
+    }
+
     client.join(`room:${data.bookingId}`);
+    client.to(`room:${data.bookingId}`).emit('user-joined', { userId: data.userId });
     console.log(`Client ${client.id} joined video room ${data.bookingId}`);
   }
 

@@ -20,6 +20,12 @@ export class BookingsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getBooking(@Param('id') id: string, @Req() req: any) {
+    return this.bookingsService.getBooking(id, req.user.userId, req.user.role);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/status')
   async updateStatus(
     @Param('id') id: string,

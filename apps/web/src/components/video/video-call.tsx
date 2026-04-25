@@ -10,7 +10,7 @@ interface VideoCallProps {
 
 export const VideoCall: React.FC<VideoCallProps> = ({ otherUserId }) => {
   const { token } = useAuth();
-  const socket = useSocket('video', token);
+  const { socket } = useSocket('video', token);
   
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -22,7 +22,10 @@ export const VideoCall: React.FC<VideoCallProps> = ({ otherUserId }) => {
   const pcRef = useRef<RTCPeerConnection | null>(null);
 
   const configuration = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+    ],
   };
 
   useEffect(() => {

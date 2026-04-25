@@ -322,7 +322,7 @@ function RegisterContent() {
         throw new Error(data.message || "Registration failed");
       }
 
-      login(data.accessToken, data.user);
+      login(data.accessToken, data.refreshToken, data.user);
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(message);

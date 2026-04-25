@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "./api";
 
 type User = {
   id: string;
@@ -9,13 +10,14 @@ type User = {
   role: "CUSTOMER" | "CAREGIVER" | "ADMIN";
   firstName: string;
   lastName: string;
+  avatarUrl?: string | null;
 };
 
 type AuthContextType = {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (token: string, user: User) => void;
+  login: (accessToken: string, refreshToken: string, user: User) => void;
   logout: () => void;
 };
 
@@ -28,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if token exists in localStorage
     const storedToken = localStorage.getItem("token");
     const checkAuth = async () => {
       if (!storedToken) {
@@ -36,24 +37,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       try {
-        const res = await fetch("http://localhost:4000/auth/me", {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${storedToken}`,
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-          setToken(storedToken);
-        } else {
-          setUser(null);
-          setToken(null);
-          localStorage.removeItem("token");
-        }
+        const data = await api.get("/auth/me", storedToken);
+        setUser(data);
+        setToken(storedToken);
       } catch {
         setUser(null);
         setToken(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
       } finally {
         setIsLoading(false);
       }
@@ -61,25 +52,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = (newToken: string, user: User) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-    setUser(user);
-    if (user.role === "ADMIN") router.push("/admin/users");
-    else if (user.role === "CAREGIVER") router.push("/gigs");
-    else router.push("/dashboard");
+  const login = (accessToken: string, refreshToken: string, userData: User) => {
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    setToken(accessToken);
+    setUser(userData);
+
+    // Redirect based on role
+    if (userData.role === "ADMIN") router.push("/admin");
+    else if (userData.role === "CAREGIVER") router.push("/caregiver/dashboard");
+    else router.push("/customer/dashboard");
   };
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:4000/auth/logout", { 
-        method: "POST",
-        headers: token ? { "Authorization": `Bearer ${token}` } : undefined
-      });
-    } catch (e) {
-      console.error("Logout failed", e);
+      await api.post("/auth/logout", undefined, token);
+    } catch {
+      // Ignore errors — we're logging out anyway
     }
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     setToken(null);
     setUser(null);
     router.push("/login");

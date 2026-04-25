@@ -3,6 +3,8 @@
 import { HeartPulse } from "lucide-react";
 import Link from "next/link";
 
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+
 export default function AuthLayout({
   children,
 }: {

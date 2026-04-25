@@ -1,32 +1,35 @@
-import { useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+"use client";
 
-export const useSocket = (namespace: string, token: string | null) => {
+import { useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+export function useSocket(namespace: string, token: string | null) {
   const socketRef = useRef<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (!token) return;
 
-    socketRef.current = io(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/${namespace}`, {
-      auth: {
-        token,
-      },
+    const socket = io(`${API_URL}/${namespace}`, {
+      auth: { token },
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
     });
 
-    socketRef.current.on('connect', () => {
-      console.log(`Connected to ${namespace}`);
-    });
+    socket.on("connect", () => setIsConnected(true));
+    socket.on("disconnect", () => setIsConnected(false));
 
-    socketRef.current.on('connect_error', (err) => {
-      console.error(`Connection error for ${namespace}:`, err);
-    });
+    socketRef.current = socket;
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      socket.disconnect();
+      socketRef.current = null;
     };
   }, [namespace, token]);
 
-  return socketRef.current;
-};
+  return { socket: socketRef.current, isConnected };
+}

@@ -117,21 +117,120 @@ export class AdminService {
   }
 
   async getAnalytics() {
-    const [totalUsers, totalBookings, pendingVerifications, totalRevenue] = await Promise.all([
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+
+    const [
+      totalUsers,
+      totalCaregivers,
+      totalCustomers,
+      totalBookings,
+      bookingsByStatus,
+      pendingVerifications,
+      revenueTotal,
+      monthlyRevenue,
+      monthlyUsers,
+      recentLogs,
+    ] = await Promise.all([
       this.prisma.user.count(),
-      this.prisma.booking.count({ where: { status: 'COMPLETED' } }),
+      this.prisma.user.count({ where: { role: 'CAREGIVER' } }),
+      this.prisma.user.count({ where: { role: 'CUSTOMER' } }),
+      this.prisma.booking.count(),
+      this.prisma.booking.groupBy({
+        by: ['status'],
+        _count: { status: true },
+      }),
       this.prisma.caregiverProfile.count({ where: { verificationStatus: 'PENDING' } }),
       this.prisma.booking.aggregate({
         where: { status: 'COMPLETED' },
         _sum: { totalCost: true },
       }),
+      this.prisma.$queryRaw`
+        SELECT DATE_TRUNC('month', "scheduledAt") as month,
+               SUM("totalCost") as revenue,
+               COUNT(*) as count
+        FROM "Booking"
+        WHERE status = 'COMPLETED'
+          AND "scheduledAt" >= ${twelveMonthsAgo}
+        GROUP BY month
+        ORDER BY month ASC
+      `,
+      this.prisma.$queryRaw`
+        SELECT DATE_TRUNC('month', "createdAt") as month,
+               COUNT(*) as count
+        FROM "User"
+        WHERE "createdAt" >= ${twelveMonthsAgo}
+        GROUP BY month
+        ORDER BY month ASC
+      `,
+      this.prisma.auditLog.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: { admin: { include: { profile: true } } },
+      }),
     ]);
 
     return {
-      activeUsers: totalUsers, // For simplicity using total users as active
-      completedBookings: totalBookings,
-      pendingVerifications,
-      totalRevenue: totalRevenue._sum.totalCost || 0,
+      stats: {
+        totalUsers,
+        totalCaregivers,
+        totalCustomers,
+        totalBookings,
+        pendingVerifications,
+        totalRevenue: revenueTotal._sum.totalCost || 0,
+      },
+      bookingsByStatus,
+      monthlyRevenue,
+      monthlyUsers,
+      recentLogs,
     };
+  }
+
+  async getBookings(status?: string, page = 1, limit = 20, search?: string) {
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { id: { contains: search } },
+        { customer: { profile: { firstName: { contains: search, mode: 'insensitive' } } } },
+        { caregiver: { profile: { firstName: { contains: search, mode: 'insensitive' } } } },
+      ];
+    }
+
+    const [bookings, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          customer: { include: { profile: true } },
+          caregiver: { include: { profile: true } },
+        },
+      }),
+      this.prisma.booking.count({ where }),
+    ]);
+
+    return { data: bookings, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async adminCancelBooking(bookingId: string, adminId: string) {
+    const booking = await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: { status: 'CANCELLED' },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId,
+        action: 'CANCEL_BOOKING',
+        targetId: bookingId,
+        targetType: 'BOOKING',
+      },
+    });
+
+    return booking;
   }
 }

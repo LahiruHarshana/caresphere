@@ -18,6 +18,7 @@ async function main() {
   await prisma.booking.deleteMany();
   await prisma.familyVault.deleteMany();
   await prisma.caregiverProfile.deleteMany();
+  await prisma.customerProfile.deleteMany();
   await prisma.profile.deleteMany();
   await prisma.user.deleteMany();
 
@@ -75,6 +76,7 @@ async function main() {
             certifications: ['CPR', 'First Aid'],
             verificationStatus: VerificationStatus.APPROVED,
             isAvailable: true,
+            agreedToBackgroundCheck: true,
           },
         },
       },
@@ -99,6 +101,15 @@ async function main() {
             address: `456 Home Ave`,
             lat: 40.7128,
             lng: -74.0060,
+            dateOfBirth: new Date('1985-06-15'),
+          },
+        },
+        customerProfile: {
+          create: {
+            careType: ['Elderly Care', 'Child Care', 'Special Needs Care'][i - 1],
+            careFrequency: 'Weekly',
+            preferredSchedule: 'Morning (8AM - 12PM)',
+            specialRequirements: i === 1 ? 'Wheelchair accessible' : null,
           },
         },
       },

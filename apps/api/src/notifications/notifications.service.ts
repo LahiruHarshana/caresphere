@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsGateway } from './notifications.gateway';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { baseTemplate } from './templates/base.template';
 
 @Injectable()
 export class NotificationsService {
@@ -24,7 +25,7 @@ export class NotificationsService {
     });
   }
 
-  async sendNotification(userId: string, type: string, title: string, body: string) {
+  async sendNotification(userId: string, type: string, title: string, body: string, htmlContent?: string) {
     // 1. Save to DB
     const notification = await this.prisma.notification.create({
       data: {
@@ -39,14 +40,14 @@ export class NotificationsService {
     this.gateway.sendNotification(userId, notification);
 
     // 3. Email delivery
-    this.sendEmail(userId, title, body).catch((err) => {
+    this.sendEmail(userId, title, body, htmlContent).catch((err) => {
       this.logger.error(`Failed to send email to user ${userId}: ${err.message}`);
     });
 
     return notification;
   }
 
-  private async sendEmail(userId: string, title: string, body: string) {
+  private async sendEmail(userId: string, title: string, body: string, htmlContent?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { email: true },
@@ -60,12 +61,7 @@ export class NotificationsService {
         to: user.email,
         subject: title,
         text: body,
-        html: `<div style="font-family: sans-serif; padding: 20px;">
-                <h2 style="color: #0d9488;">${title}</h2>
-                <p>${body}</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #666;">This is an automated notification from CareSphere.</p>
-               </div>`,
+        html: htmlContent || baseTemplate(`<h2>${title}</h2><p>${body}</p>`),
       });
     } catch (error) {
         this.logger.error(`Error sending email: ${error}`);

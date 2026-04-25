@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException, Query, Param } from '@nestjs/common';
 import { CaregiversService } from './caregivers.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UpdateCaregiverProfileDto } from './dto/caregiver-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 
@@ -17,6 +17,26 @@ if (!fs.existsSync(uploadDir)) {
 @Controller('caregivers')
 export class CaregiversController {
   constructor(private readonly caregiversService: CaregiversService) {}
+
+  @Get('browse')
+  async browseCaregivers(
+    @Query('specialty') specialty?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.caregiversService.browseCaregivers(
+      specialty,
+      parseInt(page || '1'),
+      parseInt(limit || '12'),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('CAREGIVER')
+  @Get('dashboard')
+  async getDashboard(@Req() req: any) {
+    return this.caregiversService.getDashboard(req.user.userId);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('CAREGIVER')
@@ -35,20 +55,17 @@ export class CaregiversController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('CAREGIVER')
   @Post('verify')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: uploadDir,
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
-      },
-    }),
-  }))
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async uploadVerificationDocument(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('File is required');
     }
-    const fileUrl = `/uploads/${file.filename}`;
-    return this.caregiversService.uploadVerification(req.user.userId, fileUrl);
+    return this.caregiversService.uploadVerification(req.user.userId, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getPublicProfile(@Param('id') id: string) {
+    return this.caregiversService.getPublicProfile(id);
   }
 }

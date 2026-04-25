@@ -23,7 +23,7 @@ interface Message {
 export const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, otherUser, token, bookingId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const socket = useSocket('chat', token);
+  const { socket } = useSocket('chat', token);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {

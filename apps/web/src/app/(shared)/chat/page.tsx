@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { ChatWindow } from '@/components/chat/chat-window';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, ChevronLeft } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -27,6 +27,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showList, setShowList] = useState(true);
 
   useEffect(() => {
     if (!token) return;
@@ -66,7 +67,7 @@ export default function ChatPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100%-80px)]">
-        <div className="md:col-span-1 border rounded-2xl bg-white overflow-y-auto shadow-sm">
+        <div className={`md:col-span-1 border rounded-2xl bg-white overflow-y-auto shadow-sm ${selectedUser && !showList ? 'hidden md:block' : ''}`}>
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700 mx-auto"></div>
@@ -81,7 +82,10 @@ export default function ChatPage() {
             conversations.map((conv) => (
               <button
                 key={conv.otherUser.id}
-                onClick={() => setSelectedUser(conv.otherUser)}
+                onClick={() => {
+                  setSelectedUser(conv.otherUser);
+                  setShowList(false);
+                }}
                 className={`w-full text-left p-4 border-b hover:bg-gray-50 transition-colors ${
                   selectedUser?.id === conv.otherUser.id ? 'bg-teal-50' : ''
                 }`}
@@ -110,17 +114,28 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className="md:col-span-2 h-full">
+        <div className={`md:col-span-2 h-full flex flex-col ${!selectedUser || showList ? 'hidden md:flex' : ''}`}>
           {selectedUser ? (
-            <ChatWindow
-              currentUser={user}
-              otherUser={{
-                id: selectedUser.id,
-                firstName: selectedUser.profile.firstName,
-                lastName: selectedUser.profile.lastName,
-              }}
-              token={token}
-            />
+            <>
+              <div className="md:hidden mb-4">
+                <button
+                  onClick={() => setShowList(true)}
+                  className="flex items-center text-sm font-medium text-teal-700 bg-teal-50 px-3 py-2 rounded-lg"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Back to conversations
+                </button>
+              </div>
+              <ChatWindow
+                currentUser={user}
+                otherUser={{
+                  id: selectedUser.id,
+                  firstName: selectedUser.profile.firstName,
+                  lastName: selectedUser.profile.lastName,
+                }}
+                token={token}
+              />
+            </>
           ) : (
             <div className="h-full flex items-center justify-center border rounded-2xl bg-gradient-to-br from-gray-50 to-teal-50/30 shadow-sm">
               <div className="text-center">

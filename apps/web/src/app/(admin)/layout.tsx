@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Heart, FileText, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, Heart, FileText, LogOut, Shield, CalendarCheck } from "lucide-react";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function AdminLayout({
   children,
@@ -33,6 +34,7 @@ export default function AdminLayout({
     { label: "Analytics", href: "/admin/analytics", icon: LayoutDashboard },
     { label: "Users", href: "/admin/users", icon: Users },
     { label: "Caregivers", href: "/admin/caregivers", icon: Heart },
+    { label: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
     { label: "Audit Logs", href: "/admin/logs", icon: FileText },
   ];
 
@@ -84,7 +86,9 @@ export default function AdminLayout({
       </div>
 
       <main className="flex-1 p-8 overflow-auto">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </div>
   );

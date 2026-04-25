@@ -2,10 +2,14 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto } from './dto/booking.dto';
 import { BookingStatus } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async createBooking(customerId: string, data: CreateBookingDto) {
     // Check if caregiver exists and has a caregiver profile
@@ -47,6 +51,10 @@ export class BookingsService {
       throw new BadRequestException('Caregiver is already booked for this time slot');
     }
 
+    // Calculate cost based on duration and hourly rate
+    const durationHours = (scheduledEnd.getTime() - scheduledStart.getTime()) / (1000 * 60 * 60);
+    const totalCost = durationHours * caregiver.hourlyRate;
+
     return this.prisma.booking.create({
       data: {
         customerId,
@@ -56,15 +64,53 @@ export class BookingsService {
         endAt: scheduledEnd,
         notes: data.notes,
         status: BookingStatus.PENDING,
+        totalCost,
       },
     });
   }
 
-  async getUserBookings(userId: string, role: string) {
-    if (role === 'CAREGIVER') {
-      return this.prisma.booking.findMany({ where: { caregiverId: userId }, orderBy: { scheduledAt: 'desc' } });
+  async getBooking(bookingId: string, userId: string, role: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        customer: { include: { profile: true } },
+        caregiver: { include: { profile: true, caregiverProfile: true } },
+        reviews: { include: { author: { include: { profile: true } } } },
+        invoices: true,
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
     }
-    return this.prisma.booking.findMany({ where: { customerId: userId }, orderBy: { scheduledAt: 'desc' } });
+
+    // Authorization check
+    if (role === 'CUSTOMER' && booking.customerId !== userId) {
+      throw new ForbiddenException('Not authorized');
+    }
+    if (role === 'CAREGIVER' && booking.caregiverId !== userId) {
+      throw new ForbiddenException('Not authorized');
+    }
+
+    return booking;
+  }
+
+  async getUserBookings(userId: string, role: string) {
+    const where = role === 'CAREGIVER' ? { caregiverId: userId } : { customerId: userId };
+
+    return this.prisma.booking.findMany({
+      where,
+      orderBy: { scheduledAt: 'desc' },
+      include: {
+        customer: {
+          include: { profile: true },
+        },
+        caregiver: {
+          include: { profile: true, caregiverProfile: true },
+        },
+        reviews: true,
+      },
+    });
   }
 
   async updateBookingStatus(bookingId: string, userId: string, role: string, newStatus: BookingStatus) {
@@ -99,10 +145,47 @@ export class BookingsService {
       throw new ForbiddenException('Customers can only cancel bookings');
     }
 
-    return this.prisma.booking.update({
+    const updatedBooking = await this.prisma.booking.update({
       where: { id: bookingId },
       data: { status: newStatus },
+      include: {
+        customer: { include: { profile: true } },
+        caregiver: { include: { profile: true } },
+      },
     });
+
+    // Send notification to the other party
+    const notifyUserId = role === 'CAREGIVER' ? updatedBooking.customerId : updatedBooking.caregiverId;
+    const statusMessages: Record<string, { title: string; body: string }> = {
+      CONFIRMED: {
+        title: 'Booking Confirmed',
+        body: `Your booking for ${updatedBooking.serviceType} has been confirmed.`,
+      },
+      IN_PROGRESS: {
+        title: 'Caregiver Has Arrived',
+        body: `Your ${updatedBooking.serviceType} session is now in progress.`,
+      },
+      COMPLETED: {
+        title: 'Booking Completed',
+        body: `Your ${updatedBooking.serviceType} session has been completed. Please leave a review!`,
+      },
+      CANCELLED: {
+        title: 'Booking Cancelled',
+        body: `A booking for ${updatedBooking.serviceType} has been cancelled.`,
+      },
+    };
+
+    const notification = statusMessages[newStatus];
+    if (notification) {
+      await this.notificationsService.sendNotification(
+        notifyUserId,
+        'BOOKING_UPDATE',
+        notification.title,
+        notification.body,
+      );
+    }
+
+    return updatedBooking;
   }
 
   async cancelBooking(bookingId: string, userId: string, role: string) {

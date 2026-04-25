@@ -33,7 +33,7 @@ export default function LoginPage() {
         throw new Error(data.message || "Invalid credentials");
       }
 
-      login(data.accessToken, data.user);
+      login(data.accessToken, data.refreshToken, data.user);
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(message);
@@ -155,7 +155,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="text-sm">
-                  <Link href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                  <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                     Forgot your password?
                   </Link>
                 </div>

@@ -34,7 +34,7 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
 export const LiveMap: React.FC<LiveMapProps> = ({ initialLat, initialLng, caregiverId }) => {
   const [position, setPosition] = useState<[number, number]>([initialLat, initialLng]);
   const { token } = useAuth();
-  const socket = useSocket('location', token);
+  const { socket } = useSocket('location', token);
 
   useEffect(() => {
     if (!socket) return;

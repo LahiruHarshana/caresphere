@@ -2,6 +2,8 @@
 
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -111,6 +113,17 @@ const TestimonialCard = ({
 );
 
 export default function LandingPage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (user.role === "ADMIN") router.push("/admin/analytics");
+      else if (user.role === "CAREGIVER") router.push("/caregiver/dashboard");
+      else router.push("/customer/dashboard");
+    }
+  }, [user, isLoading, router]);
+
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
