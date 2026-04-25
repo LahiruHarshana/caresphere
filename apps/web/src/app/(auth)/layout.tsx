@@ -2,6 +2,7 @@
 
 import { HeartPulse } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
@@ -10,6 +11,13 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  // The login page defines its own full-screen split layout.
+  if (pathname === "/login") {
+    return <ErrorBoundary>{children}</ErrorBoundary>;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50/30 flex flex-col">
       <header className="w-full py-6 px-8">

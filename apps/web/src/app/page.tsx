@@ -11,6 +11,7 @@ import {
   Lock,
   MapPin,
   Video,
+  PlayCircle,
   Heart,
   CheckCircle,
   Shield,
@@ -111,6 +112,14 @@ const TestimonialCard = ({
     </div>
   </motion.div>
 );
+
+const LANDING_MEDIA = {
+  careVideoEmbed: "https://www.youtube-nocookie.com/embed/cR8JVwNa3bI?rel=0&modestbranding=1",
+  matchingImage: "/media/images/landing-matching.jpg",
+  familyImage: "/media/images/landing-family.jpg",
+  featureThumb: "/media/images/feature-smart-matching.jpg",
+  aboutImage: "/media/images/about-caregiver-senior.jpg",
+};
 
 export default function LandingPage() {
   const { user, isLoading } = useAuth();
@@ -399,6 +408,98 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
+        {/* How It Works Section */}
+        <section id="how-it-works" className="py-24 bg-gradient-to-b from-white to-slate-50">
+          <div className="container mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-14"
+            >
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-100 text-primary-700 text-sm font-bold uppercase tracking-wider mb-6">
+                How It Works
+              </span>
+              <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6 font-heading">
+                See How Care Starts in
+                <span className="gradient-text"> Minutes</span>
+              </h2>
+              <p className="text-lg text-gray-600">
+                From discovery to first visit, CareSphere keeps every step clear, safe, and
+                personal.
+              </p>
+            </motion.div>
+
+            <div className="grid lg:grid-cols-5 gap-8 items-stretch">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="lg:col-span-3 rounded-3xl overflow-hidden bg-gray-900 relative shadow-2xl"
+              >
+                <iframe
+                  src={LANDING_MEDIA.careVideoEmbed}
+                  title="CareSphere Platform Video"
+                  className="w-full h-full min-h-[360px]"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-white font-bold text-xl">Real caregivers. Real moments.</p>
+                    <p className="text-white/80 text-sm mt-1">
+                      Interview, match, and book with confidence.
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 text-white text-sm font-semibold">
+                    <PlayCircle className="w-4 h-4" />
+                    Live Platform Preview
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="lg:col-span-2 space-y-6"
+              >
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-soft-xl p-6">
+                  <img
+                    src={LANDING_MEDIA.familyImage}
+                    alt="Family meeting a professional caregiver"
+                    className="w-full h-40 object-cover rounded-2xl mb-4"
+                  />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Personalized Matching</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    We pair families with caregivers based on care type, schedule, language,
+                    and personality fit.
+                  </p>
+                </div>
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-soft-xl p-6">
+                  <ul className="space-y-4">
+                    {[
+                      "Post your care needs in under 2 minutes",
+                      "Compare verified caregivers with real reviews",
+                      "Start with chat or a secure video introduction",
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-3 text-gray-700">
+                        <CheckCircle className="w-5 h-5 text-primary mt-0.5" />
+                        <span className="text-sm leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section id="features" className="py-24 bg-gradient-to-b from-white to-primary-50/30">
           <div className="container mx-auto px-6">
@@ -484,7 +585,7 @@ secure payments.
               />
               {i === 0 && (
                 <div className="absolute -bottom-4 -right-4 w-24 h-24 opacity-5">
-                  <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=200&h=200&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
+                  <img src={LANDING_MEDIA.featureThumb} alt="Care matching visual" className="w-full h-full object-cover rounded-full" />
                 </div>
               )}
             </motion.div>
@@ -603,7 +704,7 @@ transition={{ duration: 0.4 }}
 className="aspect-square rounded-[3rem] overflow-hidden shadow-soft-2xl"
 >
 <img
-src="https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?w=800&h=800&fit=crop"
+src={LANDING_MEDIA.aboutImage}
 alt="Professional caregiver with senior patient"
 className="w-full h-full object-cover"
 />

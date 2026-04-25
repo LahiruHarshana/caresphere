@@ -6,6 +6,20 @@ import { VerificationStatus } from '@prisma/client';
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
+  private toNumber(value: unknown): number {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'bigint') return Number(value);
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (value && typeof value === 'object' && 'toString' in value) {
+      const parsed = Number((value as { toString: () => string }).toString());
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
+  }
+
   async getUsers(search?: string, role?: string) {
     return this.prisma.user.findMany({
       where: {
@@ -170,6 +184,21 @@ export class AdminService {
       }),
     ]);
 
+    const normalizedMonthlyRevenue = (
+      monthlyRevenue as Array<{ month: Date | string; revenue: unknown; count: unknown }>
+    ).map((row) => ({
+      month: row.month,
+      revenue: this.toNumber(row.revenue),
+      count: this.toNumber(row.count),
+    }));
+
+    const normalizedMonthlyUsers = (
+      monthlyUsers as Array<{ month: Date | string; count: unknown }>
+    ).map((row) => ({
+      month: row.month,
+      count: this.toNumber(row.count),
+    }));
+
     return {
       stats: {
         totalUsers,
@@ -177,11 +206,11 @@ export class AdminService {
         totalCustomers,
         totalBookings,
         pendingVerifications,
-        totalRevenue: revenueTotal._sum.totalCost || 0,
+        totalRevenue: this.toNumber(revenueTotal._sum.totalCost),
       },
       bookingsByStatus,
-      monthlyRevenue,
-      monthlyUsers,
+      monthlyRevenue: normalizedMonthlyRevenue,
+      monthlyUsers: normalizedMonthlyUsers,
       recentLogs,
     };
   }

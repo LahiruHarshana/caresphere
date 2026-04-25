@@ -39,8 +39,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${plusJakarta.variable} ${outfit.variable} font-body antialiased`}>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body
+        className={`${plusJakarta.variable} ${outfit.variable} font-body antialiased`}
+        suppressHydrationWarning
+      >
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>

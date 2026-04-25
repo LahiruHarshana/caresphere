@@ -5,10 +5,11 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { HeartPulse } from "lucide-react";
+import { ArrowLeft, HeartPulse } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const loginSideImage = "/media/images/login-side.jpg";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,9 +49,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary to-primary-600">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1629904853716-f0bc54eea481?w=1200&h=1600&fit=crop')] bg-cover bg-center opacity-20" />
+    <div className="min-h-screen bg-slate-100 relative overflow-hidden flex">
+      <div className="pointer-events-none absolute -top-28 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary to-primary-700">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${loginSideImage})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/55 to-primary-900/70" />
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
           <h1 className="text-5xl font-bold mb-6">Welcome Back to CareSphere</h1>
           <p className="text-xl text-primary-100 mb-8">
@@ -72,15 +80,25 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center py-12 px-8 sm:px-6 lg:px-16">
+      <div className="flex-1 relative z-10 flex flex-col justify-center py-10 px-6 sm:px-8 lg:px-16">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm backdrop-blur hover:bg-white hover:text-slate-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to home
+          </Link>
+        </div>
+
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
               <HeartPulse className="w-7 h-7 text-white" />
             </div>
             <span className="text-2xl font-bold text-gray-900">CareSphere</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          <h2 className="text-4xl leading-tight font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-gray-600">
             Or{" "}
             <Link href="/register?role=CUSTOMER" className="text-primary hover:text-primary-600 font-medium">
@@ -90,7 +108,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-6 shadow-xl rounded-2xl border border-gray-100">
+          <div className="bg-white/85 backdrop-blur-sm py-8 px-6 shadow-2xl shadow-slate-300/40 rounded-2xl border border-white/70 ring-1 ring-slate-100">
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
