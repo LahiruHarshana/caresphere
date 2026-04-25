@@ -111,7 +111,7 @@ export default function NotificationsPage() {
         </div>
       ) : notifications.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-          <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900">No notifications</h3>
           <p className="text-gray-500 mt-1">We&apos;ll notify you when something important happens.</p>
         </div>

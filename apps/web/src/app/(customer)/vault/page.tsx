@@ -186,8 +186,8 @@ export default function VaultPage() {
               </div>
 
               <div className="border-t border-b py-4 my-4">
-                <p className="text-sm text-gray-400 italic mb-2">Encrypted Data (Base64/Hex):</p>
-                <div className="bg-white p-3 rounded border font-mono text-xs break-all text-gray-400">
+<p className="text-sm text-gray-600 italic mb-2">Encrypted Data (Base64/Hex):</p>
+                  <div className="bg-white p-3 rounded border font-mono text-xs break-all text-gray-600">
                   {entry.encryptedData.substring(0, 100)}...
                 </div>
               </div>

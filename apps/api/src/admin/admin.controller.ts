@@ -26,13 +26,13 @@ export class AdminController {
     return this.adminService.getPendingCaregivers();
   }
 
-  @Post('caregivers/:id/verify')
+  @Post('caregivers/:userId/verify')
   verifyCaregiver(
-    @Param('id') id: string,
+    @Param('userId') userId: string,
     @Body('status') status: VerificationStatus,
     @Req() req: any,
   ) {
-    return this.adminService.verifyCaregiver(id, status, req.user.id);
+    return this.adminService.verifyCaregiver(userId, status, req.user.id);
   }
 
   @Get('logs')

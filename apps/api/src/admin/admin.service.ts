@@ -68,15 +68,15 @@ export class AdminService {
     });
   }
 
-  async verifyCaregiver(caregiverProfileId: string, status: VerificationStatus, adminId: string) {
+  async verifyCaregiver(userId: string, status: VerificationStatus, adminId: string) {
     const profile = await this.prisma.caregiverProfile.findUnique({
-      where: { id: caregiverProfileId },
+      where: { userId },
       include: { user: true },
     });
     if (!profile) throw new NotFoundException('Caregiver profile not found');
 
     const updatedProfile = await this.prisma.caregiverProfile.update({
-      where: { id: caregiverProfileId },
+      where: { userId },
       data: { verificationStatus: status },
     });
 

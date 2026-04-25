@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
+import { Heart, Clock, CheckCircle } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -71,47 +72,77 @@ export default function GigsPage() {
     }
   };
 
-  if (authLoading || loading) {
-    return <div className="p-8 text-center text-teal-700">Loading gigs...</div>;
+if (authLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   const pendingBookings = bookings.filter((b) => b.status === "PENDING");
   const confirmedBookings = bookings.filter((b) => b.status === "CONFIRMED");
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-teal-700 mb-8">Available Gigs</h1>
-      
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold text-teal-700 mb-4 border-b pb-2 border-teal-100">
-          Pending Requests
-        </h2>
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Available Gigs</h1>
+          <p className="text-gray-500 mt-1">Manage your booking requests</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+            {pendingBookings.length} Pending
+          </span>
+          <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
+            {confirmedBookings.length} Confirmed
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+            <Clock className="w-4 h-4 text-amber-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Pending Requests
+          </h2>
+        </div>
         {pendingBookings.length === 0 ? (
-          <p className="text-gray-500">No pending requests at the moment.</p>
+          <div className="bg-gray-50 p-8 rounded-2xl border-2 border-dashed border-gray-200 text-center">
+            <p className="text-gray-500">No pending requests at the moment.</p>
+            <p className="text-sm text-gray-400 mt-1">New requests will appear here</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {pendingBookings.map((booking) => (
-              <div key={booking.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800">
-                    {booking.serviceType}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {new Date(booking.scheduledAt).toLocaleString()} - {new Date(booking.endAt).toLocaleTimeString()}
-                  </p>
-                  {booking.notes && (
-                    <p className="text-sm text-gray-500 mt-2 italic">&quot;{booking.notes}&quot;</p>
-                  )}
+              <div key={booking.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">
+                      {booking.serviceType}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {new Date(booking.scheduledAt).toLocaleString()} - {new Date(booking.endAt).toLocaleTimeString()}
+                    </p>
+                    {booking.notes && (
+                      <p className="text-sm text-gray-500 mt-2 italic">&quot;{booking.notes}&quot;</p>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-4 md:mt-0 flex gap-3">
-                  <Button 
-                    className="bg-amber-500 hover:bg-amber-600 text-white"
+                  <Button
+                    className="bg-teal-700 hover:bg-teal-800 text-white"
                     onClick={() => handleUpdateStatus(booking.id, "CONFIRMED")}
                   >
                     Accept
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="text-red-600 hover:bg-red-50 border-red-200"
                     onClick={() => handleUpdateStatus(booking.id, "CANCELLED")}
                   >
@@ -125,25 +156,38 @@ export default function GigsPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold text-teal-700 mb-4 border-b pb-2 border-teal-100">
-          Confirmed Gigs
-        </h2>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
+            <CheckCircle className="w-4 h-4 text-teal-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Confirmed Gigs
+          </h2>
+        </div>
         {confirmedBookings.length === 0 ? (
-          <p className="text-gray-500">No confirmed gigs yet.</p>
+          <div className="bg-gray-50 p-8 rounded-2xl border-2 border-dashed border-gray-200 text-center">
+            <p className="text-gray-500">No confirmed gigs yet.</p>
+            <p className="text-sm text-gray-400 mt-1">Accept pending requests to see them here</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {confirmedBookings.map((booking) => (
-              <div key={booking.id} className="bg-teal-50 p-6 rounded-lg shadow-sm border border-teal-100 flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                  <h3 className="font-bold text-lg text-teal-900">
-                    {booking.serviceType}
-                  </h3>
-                  <p className="text-sm text-teal-700">
-                    {new Date(booking.scheduledAt).toLocaleString()} - {new Date(booking.endAt).toLocaleTimeString()}
-                  </p>
+              <div key={booking.id} className="bg-gradient-to-r from-teal-50 to-white p-6 rounded-2xl shadow-sm border border-teal-100 flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-teal-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-teal-900">
+                      {booking.serviceType}
+                    </h3>
+                    <p className="text-sm text-teal-700">
+                      {new Date(booking.scheduledAt).toLocaleString()} - {new Date(booking.endAt).toLocaleTimeString()}
+                    </p>
+                  </div>
                 </div>
                 <div className="mt-4 md:mt-0">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-teal-100 text-teal-800">
                     Confirmed
                   </span>
                 </div>

@@ -18,7 +18,6 @@ import {
   Sparkles,
   Award,
   Users2,
-  HeartHandshake,
 } from "lucide-react";
 
 const FloatingShape = ({
@@ -75,64 +74,6 @@ const AnimatedCounter = ({ target, suffix = "" }: { target: number; suffix?: str
   );
 };
 
-const FeatureCard = ({
-  icon: Icon,
-  title,
-  description,
-  index,
-  accentColor = "primary",
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  index: number;
-  accentColor?: "primary" | "accent";
-}) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 60, rotateX: 10 }}
-      animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-      transition={{
-        duration: 0.8,
-        delay: index * 0.15,
-        ease: [0.4, 0, 0.2, 1],
-      }}
-      whileHover={{ y: -12, scale: 1.02 }}
-      className="group relative p-8 rounded-3xl bg-white border border-gray-100 shadow-soft-xl cursor-pointer overflow-hidden"
-    >
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-accent-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        layoutId={`feature-bg-${index}`}
-      />
-
-      <div
-        className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 ${
-          accentColor === "primary"
-            ? "bg-gradient-to-br from-primary-500 to-primary-600 group-hover:scale-110 group-hover:rotate-6"
-            : "bg-gradient-to-br from-accent-400 to-accent-500 group-hover:scale-110 group-hover:-rotate-6"
-        }`}
-      >
-        <Icon className="w-8 h-8 text-white" />
-      </div>
-
-      <h3 className="relative z-10 text-xl font-bold text-gray-900 mb-4 font-heading group-hover:text-primary transition-colors">
-        {title}
-      </h3>
-      <p className="relative z-10 text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors">
-        {description}
-      </p>
-
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
-      />
-    </motion.div>
-  );
-};
-
 const TestimonialCard = ({
   quote,
   author,
@@ -152,7 +93,7 @@ const TestimonialCard = ({
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
-          className={`w-5 h-5 ${i < rating ? "text-accent fill-accent" : "text-gray-200"}`}
+          className={`w-5 h-5 ${i < rating ? "text-accent fill-accent" : "text-gray-400"}`}
         />
       ))}
     </div>
@@ -470,111 +411,71 @@ export default function LandingPage() {
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
                 Everything you need to manage care with confidence, from intelligent matching to
-                secure payments.
-              </p>
-            </motion.div>
+secure payments.
+        </p>
+      </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <FeatureCard
-                icon={Users}
-                title="Smart Matching"
-                description="Our AI-powered matching system finds the perfect caregiver based on medical needs, personality, and location."
-                index={0}
-                accentColor="primary"
-              />
-              <FeatureCard
-                icon={Lock}
-                title="Secure Vault"
-                description="Securely store and share medical records, care instructions, and emergency contacts with your care team."
-                index={1}
-                accentColor="accent"
-              />
-              <FeatureCard
-                icon={MapPin}
-                title="Live Tracking"
-                description="Real-time GPS tracking and check-in notifications keep you updated on your loved one's status."
-                index={2}
-                accentColor="primary"
-              />
-              <FeatureCard
-                icon={Video}
-                title="Video Interviews"
-                description="Meet and screen potential caregivers through our integrated, secure high-definition video platform."
-                index={3}
-                accentColor="accent"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works Section */}
-        <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
-          <div className="container mx-auto px-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[
+          {
+            icon: Users,
+            title: "Smart Matching",
+            description: "Our AI-powered matching system finds the perfect caregiver based on medical needs, personality, and location.",
+          },
+          {
+            icon: Lock,
+            title: "Secure Vault",
+            description: "Securely store and share medical records, care instructions, and emergency contacts with your care team.",
+          },
+          {
+            icon: MapPin,
+            title: "Live Tracking",
+            description: "Real-time GPS tracking and check-in notifications keep you updated on your loved one's status.",
+          },
+          {
+            icon: Video,
+            title: "Video Interviews",
+            description: "Meet and screen potential caregivers through our integrated, secure high-definition video platform.",
+          },
+        ].map((feature, i) => (
             <motion.div
+              key={feature.title}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-20"
+              transition={{ duration: 0.7, delay: i * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="group relative bg-white rounded-2xl p-6 shadow-soft-xl border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden"
             >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-100 text-primary-600 text-sm font-bold uppercase tracking-wider mb-6">
-                How It Works
-              </span>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6 font-heading">
-                Three Simple Steps to{" "}
-                <span className="gradient-text">Quality Care</span>
-              </h2>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-primary-50/50 to-accent-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                layoutId={`feature-bg-${i}`}
+              />
+              <div
+                className={`relative z-10 w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-all duration-500 ${
+                  i % 2 === 0
+                    ? "bg-gradient-to-br from-primary to-primary-600 group-hover:scale-110 group-hover:rotate-6"
+                    : "bg-gradient-to-br from-accent-400 to-accent-500 group-hover:scale-110 group-hover:-rotate-6"
+                }`}
+              >
+                <feature.icon className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="relative z-10 text-lg font-bold text-gray-900 mb-3 font-heading group-hover:text-primary transition-colors">
+                {feature.title}
+              </h3>
+              <p className="relative z-10 text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors text-sm">
+                {feature.description}
+              </p>
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
+              />
+              {i === 0 && (
+                <div className="absolute -bottom-4 -right-4 w-24 h-24 opacity-5">
+                  <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=200&h=200&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
+                </div>
+              )}
             </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              {[
-                {
-                  step: "01",
-                  title: "Create Your Profile",
-                  description:
-                    "Tell us about your care needs, schedule, and preferences. Our smart system uses this to find the perfect matches.",
-                  icon: HeartHandshake,
-                },
-                {
-                  step: "02",
-                  title: "Match & Meet",
-                  description:
-                    "Browse curated caregiver profiles, read reviews, and conduct video interviews to find your ideal match.",
-                  icon: Users2,
-                },
-                {
-                  step: "03",
-                  title: "Start Care",
-                  description:
-                    "Once you've found the right caregiver, schedule services and enjoy peace of mind with real-time updates.",
-                  icon: Heart,
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.step}
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: i * 0.2 }}
-                  whileHover={{ scale: 1.03, y: -5 }}
-                  className="relative p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 shadow-soft-xl group"
-                >
-                  <motion.div
-                    className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center text-white font-extrabold text-xl shadow-lg"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    {item.step}
-                  </motion.div>
-                  <div className="w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:scale-110 transition-all duration-500">
-                    <item.icon className="w-8 h-8 text-primary group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 font-heading">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
-                </motion.div>
-              ))}
+          ))}
             </div>
           </div>
         </section>
@@ -675,54 +576,67 @@ export default function LandingPage() {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 60 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="lg:w-1/2 relative"
-              >
-                <div className="relative">
-                  <motion.div
-                    whileHover={{ scale: 1.02, rotate: 1 }}
-                    transition={{ duration: 0.4 }}
-                    className="aspect-square rounded-[3rem] bg-gradient-to-br from-primary-100 to-accent-100 overflow-hidden shadow-soft-2xl"
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        animate={{
-                          scale: [1, 1.1, 1],
-                          rotate: [0, 5, 0],
-                        }}
-                        transition={{ duration: 6, repeat: Infinity }}
-                        className="w-48 h-48 rounded-full bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center"
-                      >
-                        <Heart className="w-24 h-24 text-white" />
-                      </motion.div>
-                    </div>
-                  </motion.div>
+<motion.div
+initial={{ opacity: 0, x: 60 }}
+whileInView={{ opacity: 1, x: 0 }}
+viewport={{ once: true }}
+transition={{ duration: 0.8 }}
+className="lg:w-1/2 relative"
+>
+<div className="relative">
+<motion.div
+whileHover={{ scale: 1.02, rotate: 1 }}
+transition={{ duration: 0.4 }}
+className="aspect-square rounded-[3rem] overflow-hidden shadow-soft-2xl"
+>
+<img
+src="https://images.unsplash.com/photo-1581579438747-104c53d7fbc4?w=800&h=800&fit=crop"
+alt="Professional caregiver with senior patient"
+className="w-full h-full object-cover"
+/>
+<div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+</motion.div>
 
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 }}
-                    whileHover={{ y: -5 }}
-                    className="absolute -bottom-8 -left-8 bg-white p-6 rounded-3xl shadow-soft-2xl border border-gray-100 max-w-[280px]"
-                  >
-                    <div className="flex items-center gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-accent fill-accent" />
-                      ))}
-                    </div>
-                    <p className="text-sm font-medium text-gray-700 italic mb-4">
-                      &quot;Finding the right care for my mother was a daunting task until we found
-                      CareSphere.&quot;
-                    </p>
-                    <p className="text-sm font-bold text-primary">Sarah J., Customer</p>
-                  </motion.div>
-                </div>
-              </motion.div>
+<motion.div
+initial={{ opacity: 0, scale: 0.8 }}
+whileInView={{ opacity: 1, scale: 1 }}
+viewport={{ once: true }}
+transition={{ delay: 0.5 }}
+whileHover={{ y: -5 }}
+className="absolute -bottom-8 -left-8 bg-white p-6 rounded-3xl shadow-soft-2xl border border-gray-100 max-w-[280px]"
+>
+<div className="flex items-center gap-1 mb-3">
+{[...Array(5)].map((_, i) => (
+<Star key={i} className="w-5 h-5 text-accent fill-accent" />
+))}
+</div>
+<p className="text-sm font-medium text-gray-700 italic mb-4">
+&quot;Finding the right care for my mother was a daunting task until we found
+CareSphere.&quot;
+</p>
+<p className="text-sm font-bold text-primary">Sarah J., Customer</p>
+</motion.div>
+
+<motion.div
+initial={{ opacity: 0, scale: 0.8 }}
+whileInView={{ opacity: 1, scale: 1 }}
+viewport={{ once: true }}
+transition={{ delay: 0.7 }}
+whileHover={{ y: -5 }}
+className="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-soft-2xl border border-gray-100"
+>
+<div className="flex items-center gap-3">
+<div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center">
+<Shield className="w-6 h-6 text-white" />
+</div>
+<div>
+<p className="font-bold text-gray-900">Verified</p>
+<p className="text-xs text-gray-500">Caregivers</p>
+</div>
+</div>
+</motion.div>
+</div>
+</motion.div>
             </div>
           </div>
         </section>

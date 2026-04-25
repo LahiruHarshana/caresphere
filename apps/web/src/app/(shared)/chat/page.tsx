@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { ChatWindow } from '@/components/chat/chat-window';
+import { MessageCircle } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -45,19 +46,37 @@ export default function ChatPage() {
   }, [token]);
 
   if (!user || !token) {
-    return <div className="p-8 text-center">Please log in to view your messages.</div>;
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <div className="text-center">
+          <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">Please log in to view your messages.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto p-4 h-[calc(100vh-100px)]">
-      <h1 className="text-2xl font-bold mb-6 text-teal-700">Your Conversations</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-        <div className="md:col-span-1 border rounded-lg bg-white overflow-y-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Your Conversations</h1>
+        <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+          {conversations.length} conversations
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100%-80px)]">
+        <div className="md:col-span-1 border rounded-2xl bg-white overflow-y-auto shadow-sm">
           {loading ? (
-            <div className="p-4 text-center">Loading...</div>
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700 mx-auto"></div>
+            </div>
           ) : conversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">No conversations yet.</div>
+            <div className="p-8 text-center">
+              <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">No conversations yet.</p>
+              <p className="text-sm text-gray-400 mt-1">Start a chat with a caregiver</p>
+            </div>
           ) : (
             conversations.map((conv) => (
               <button
@@ -68,9 +87,17 @@ export default function ChatPage() {
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold">
-                    {conv.otherUser.profile.firstName[0]}
-                  </div>
+                  {conv.otherUser.profile.avatarUrl ? (
+                    <img 
+                      src={conv.otherUser.profile.avatarUrl} 
+                      alt="Avatar" 
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center text-teal-700 font-bold">
+                      {conv.otherUser.profile.firstName[0]}
+                    </div>
+                  )}
                   <div className="flex-1 overflow-hidden">
                     <div className="font-semibold text-gray-900">
                       {conv.otherUser.profile.firstName} {conv.otherUser.profile.lastName}
@@ -95,8 +122,11 @@ export default function ChatPage() {
               token={token}
             />
           ) : (
-            <div className="h-full flex items-center justify-center border rounded-lg bg-gray-50 text-gray-500">
-              Select a conversation to start chatting
+            <div className="h-full flex items-center justify-center border rounded-2xl bg-gradient-to-br from-gray-50 to-teal-50/30 shadow-sm">
+              <div className="text-center">
+                <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 font-medium">Select a conversation to start chatting</p>
+              </div>
             </div>
           )}
         </div>

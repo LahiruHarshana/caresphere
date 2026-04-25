@@ -8,7 +8,9 @@ type CaregiverProfile = {
   id: string;
   experienceYears: number;
   specialties: string[];
+  userId: string;
   user: {
+    id: string;
     email: string;
     profile: {
       firstName: string;
@@ -42,9 +44,9 @@ export default function CaregiversPage() {
     if (token) fetchPending();
   }, [token]);
 
-  const verify = async (id: string, status: "APPROVED" | "REJECTED") => {
+  const verify = async (userId: string, status: "APPROVED" | "REJECTED") => {
     try {
-      const res = await fetch(`http://localhost:4000/admin/caregivers/${id}/verify`, {
+      const res = await fetch(`http://localhost:4000/admin/caregivers/${userId}/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +55,7 @@ export default function CaregiversPage() {
         body: JSON.stringify({ status }),
       });
       if (res.ok) {
-        setCaregivers(caregivers.filter(c => c.id !== id));
+        setCaregivers(caregivers.filter(c => c.userId !== userId));
       }
     } catch (error) {
       console.error("Failed to verify caregiver", error);
@@ -86,21 +88,21 @@ export default function CaregiversPage() {
                 Application received recently
               </div>
             </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="border-red-500 text-red-600 hover:bg-red-50"
-                onClick={() => verify(c.id, "REJECTED")}
-              >
-                Reject
-              </Button>
-              <Button
-                className="bg-teal-700 hover:bg-teal-800 text-white"
-                onClick={() => verify(c.id, "APPROVED")}
-              >
-                Approve
-              </Button>
-            </div>
+<div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="border-red-500 text-red-600 hover:bg-red-50"
+              onClick={() => verify(c.userId, "REJECTED")}
+            >
+              Reject
+            </Button>
+            <Button
+              className="bg-teal-700 hover:bg-teal-800 text-white"
+              onClick={() => verify(c.userId, "APPROVED")}
+            >
+              Approve
+            </Button>
+          </div>
           </div>
         ))}
       </div>
