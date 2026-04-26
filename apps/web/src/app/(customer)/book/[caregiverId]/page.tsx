@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
@@ -12,9 +13,9 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 type Caregiver = {
   id: string;
-  firstName: string;
-  lastName: string;
   profile?: {
+    firstName?: string;
+    lastName?: string;
     avatarUrl?: string;
   };
   caregiverProfile?: {
@@ -47,17 +48,12 @@ export default function BookCaregiverPage() {
     const fetchCaregiver = async () => {
       if (!token) return;
       try {
-        const res = await fetch(`http://localhost:4000/matching/caregivers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const match = data.find((m: { caregiver: { id: string } }) => m.caregiver.id === caregiverId);
-          if (match) {
-            setCaregiver(match.caregiver);
-            if (match.caregiver.caregiverProfile?.specialties?.length > 0) {
-              setServiceType(match.caregiver.caregiverProfile.specialties[0]);
-            }
+        const data = await api.get("/matching/caregivers", token);
+        const match = data.find((m: { caregiver: { id: string } }) => m.caregiver.id === caregiverId);
+        if (match) {
+          setCaregiver(match.caregiver);
+          if (match.caregiver.caregiverProfile?.specialties?.length > 0) {
+            setServiceType(match.caregiver.caregiverProfile.specialties[0]);
           }
         }
       } catch (err) {
@@ -72,6 +68,14 @@ export default function BookCaregiverPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    if (!serviceType) {
+      setError("Please select a service type");
+      return;
+    }
+    if (!date || !startTime) {
+      setError("Please select date and time");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -80,46 +84,21 @@ export default function BookCaregiverPage() {
       const startDateTime = new Date(`${date}T${startTime}:00`);
       const endDateTime = new Date(startDateTime.getTime() + Number(duration) * 60 * 60 * 1000);
 
-      const payload = {
+      const payload: Record<string, string> = {
         caregiverId,
         serviceType,
         scheduledAt: startDateTime.toISOString(),
         endAt: endDateTime.toISOString(),
-        notes: notes || undefined,
       };
 
-      const res = await fetch(`http://localhost:4000/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || "Failed to create booking");
+      if (notes) {
+        payload.notes = notes;
       }
 
-      const booking = await res.json();
+      const booking = await api.post("/bookings", payload, token);
 
       // Create Payment Intent
-      const paymentRes = await fetch(`http://localhost:4000/payments/create-intent`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ bookingId: booking.id }),
-      });
-
-      if (!paymentRes.ok) {
-        const errData = await paymentRes.json();
-        throw new Error(errData.message || "Failed to initialize payment");
-      }
-
-      const { clientSecret } = await paymentRes.json();
+      const { clientSecret } = await api.post("/payments/create-intent", { bookingId: booking.id }, token);
       setClientSecret(clientSecret);
       setLoading(false);
     } catch (err: unknown) {
@@ -290,11 +269,11 @@ export default function BookCaregiverPage() {
                   <img src={caregiver.profile.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
                 ) : (
                   <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">
-                    {caregiver.firstName[0]}
+                    {caregiver.profile?.firstName?.[0] ?? caregiver.profile?.displayName?.[0] ?? '?'}
                   </div>
                 )}
                 <div>
-                  <div className="font-semibold text-gray-900">{caregiver.firstName} {caregiver.lastName}</div>
+                  <div className="font-semibold text-gray-900">{caregiver.profile?.firstName} {caregiver.profile?.lastName}</div>
                   <div className="text-sm text-gray-500">${hourlyRate}/hr</div>
                 </div>
               </div>

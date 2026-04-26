@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import Stripe from 'stripe';
@@ -7,22 +7,36 @@ import Stripe from 'stripe';
 export class PaymentsService {
   private stripe: any;
   private endpointSecret: string;
+  private readonly logger = new Logger(PaymentsService.name);
 
   constructor(private prisma: PrismaService) {
-    // Use an env variable or fallback for development
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
-      apiVersion: '2025-02-24.acacia' as any,
-    });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey || stripeKey === 'sk_test_YOUR_STRIPE_SECRET_KEY_HERE') {
+      this.stripe = null;
+      this.logger.warn('Stripe secret key not configured. Payment intents will fail.');
+    } else {
+      this.stripe = new Stripe(stripeKey, {
+        apiVersion: '2024-11-20.acacia' as any,
+      });
+    }
     this.endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_dummy';
   }
 
   async createIntent(dto: CreatePaymentIntentDto, userId: string) {
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: dto.bookingId },
-      include: {
-        customer: true,
-      },
-    });
+if (!this.stripe) {
+      throw new BadRequestException('Stripe is not configured. Please set STRIPE_SECRET_KEY in environment.');
+    }
+
+    let booking;
+    try {
+      booking = await this.prisma.booking.findUnique({
+        where: { id: dto.bookingId },
+        include: { customer: true },
+      });
+    } catch (err) {
+      this.logger.error('Database error fetching booking', err);
+      throw new NotFoundException('Booking not found or database error');
+    }
 
     if (!booking) {
       throw new NotFoundException('Booking not found');
@@ -32,21 +46,27 @@ export class PaymentsService {
       throw new BadRequestException('You do not have permission to pay for this booking');
     }
 
-    if (!booking.totalCost) {
+    if (!booking.totalCost && booking.totalCost !== 0) {
       throw new BadRequestException('Booking cost is not calculated yet');
     }
 
     // Amount is in cents for Stripe (assuming totalCost is in USD dollars)
     const amount = Math.round(booking.totalCost * 100);
 
-    const paymentIntent = await this.stripe.paymentIntents.create({
-      amount,
-      currency: 'usd',
-      metadata: {
-        bookingId: booking.id,
-        customerId: userId,
-      },
-    });
+    let paymentIntent;
+    try {
+      paymentIntent = await this.stripe.paymentIntents.create({
+        amount,
+        currency: 'usd',
+        metadata: {
+          bookingId: booking.id,
+          customerId: userId,
+        },
+      });
+    } catch (err: any) {
+      this.logger.error('Stripe error creating payment intent', err?.message || err);
+      throw new BadRequestException(`Stripe error: ${err?.message || 'Failed to create payment intent'}`);
+    }
 
     return {
       clientSecret: paymentIntent.client_secret,

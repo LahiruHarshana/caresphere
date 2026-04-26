@@ -14,12 +14,27 @@ const PROFILE_MEDIA = {
 export default function CaregiverProfilePage() {
   const { id } = useParams() as { id: string };
   const [profile, setProfile] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
-      api.get(`/caregivers/${id}`).then(setProfile).catch(console.error);
+      const token = localStorage.getItem("token");
+      api
+        .get(`/caregivers/${id}`, token)
+        .then((data) => {
+          setProfile(data);
+          setError(null);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError("Unable to load caregiver profile right now.");
+        });
     }
   }, [id]);
+
+  if (error) {
+    return <div className="p-8 text-red-600">{error}</div>;
+  }
 
   if (!profile) return <div className="p-8">Loading...</div>;
 
