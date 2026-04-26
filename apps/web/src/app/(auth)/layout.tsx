@@ -13,7 +13,6 @@ export default function AuthLayout({
 }) {
   const pathname = usePathname();
 
-  // The login page defines its own full-screen split layout.
   if (pathname === "/login") {
     return <ErrorBoundary>{children}</ErrorBoundary>;
   }
@@ -22,12 +21,7 @@ export default function AuthLayout({
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50/30 flex flex-col">
       <header className="w-full py-6 px-8">
         <Link href="/" className="flex items-center gap-3 w-fit">
-          <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center shadow-glow-primary">
-            <HeartPulse className="text-white w-6 h-6" />
-          </div>
-          <span className="text-2xl font-bold text-gray-900 tracking-tight font-heading">
-            CareSphere
-          </span>
+          <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
         </Link>
       </header>
 

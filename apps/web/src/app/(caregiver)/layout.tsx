@@ -56,9 +56,7 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div className="p-6 border-b border-gray-100">
           <Link href="/caregiver/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-400 rounded-xl flex items-center justify-center">
-              <HeartPulse className="w-6 h-6 text-white" />
-            </div>
+            <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
             <div>
               <h1 className="text-lg font-bold text-gray-900">CareSphere</h1>
               <p className="text-xs text-gray-500">Caregiver Portal</p>
@@ -118,8 +116,7 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/caregiver/dashboard" className="flex items-center gap-2">
-            <HeartPulse className="w-6 h-6 text-primary" />
-            <span className="font-bold text-gray-900">CareSphere</span>
+            <img src="/logo.png" alt="CareSphere" className="h-8 w-auto" />
           </Link>
           <button onClick={logout} className="text-gray-500">
             <LogOut className="w-5 h-5" />

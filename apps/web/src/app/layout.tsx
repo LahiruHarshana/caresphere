@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import "./globals.css";
+import Head from "next/head";
 import { AuthProvider } from "@/lib/auth-context";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { ToastProvider } from "@/components/ui/toast";
@@ -25,10 +26,17 @@ export const metadata: Metadata = {
   keywords: 'caregiving, elderly care, child care, home care, caregivers',
   icons: {
     icon: [
-      {
-        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💚</text></svg>",
-        type: "image/svg+xml",
-      },
+      { url: '/favicon_io/favicon.ico' },
+      { url: '/favicon_io/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon_io/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/favicon_io/apple-touch-icon.png' },
+    ],
+    other: [
+      { rel: 'manifest', url: '/favicon_io/site.webmanifest' },
+      { rel: 'icon', sizes: '192x192', url: '/favicon_io/android-chrome-192x192.png' },
+      { rel: 'icon', sizes: '512x512', url: '/favicon_io/android-chrome-512x512.png' },
     ],
   },
 };
@@ -40,6 +48,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png" />
+        <link rel="manifest" href="/favicon_io/site.webmanifest" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon_io/android-chrome-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/favicon_io/android-chrome-512x512.png" />
+      </head>
       <body
         className={`${plusJakarta.variable} ${outfit.variable} font-body antialiased`}
         suppressHydrationWarning

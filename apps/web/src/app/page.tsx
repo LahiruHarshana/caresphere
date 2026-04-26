@@ -179,16 +179,11 @@ export default function LandingPage() {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-3"
           >
-            <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center shadow-glow-primary">
-              <Heart className="text-white w-6 h-6" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900 tracking-tight font-heading">
-              CareSphere
-            </span>
+            <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
           </motion.div>
 
           <nav className="hidden md:flex items-center gap-10">
-            {["Features", "How it Works", "About", "Pricing"].map((item, i) => (
+            {["Features", "How it Works", "About"].map((item, i) => (
               <motion.div
                 key={item}
                 initial={{ opacity: 0, y: -20 }}
@@ -755,132 +750,6 @@ className="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-soft-2xl bor
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="py-24 bg-gradient-to-b from-white to-primary-50/30">
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center max-w-3xl mx-auto mb-16"
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-100 text-primary-600 text-sm font-bold uppercase tracking-wider mb-6">
-                Pricing
-              </span>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6 font-heading">
-                Simple,{" "}
-                <span className="gradient-text">Transparent</span> Pricing
-              </h2>
-              <p className="text-lg text-gray-600">
-                No hidden fees. Pay only for the care you need.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {[
-                {
-                  title: "Basic",
-                  price: "0",
-                  desc: "For families exploring care options",
-                  features: [
-                    "Create family profile",
-                    "Browse caregiver listings",
-                    "Video interview requests",
-                    "Basic messaging",
-                  ],
-                  popular: false,
-                },
-                {
-                  title: "Premium",
-                  price: "29",
-                  desc: "Most popular for ongoing care",
-                  features: [
-                    "Everything in Basic",
-                    "AI-powered smart matching",
-                    "Unlimited video interviews",
-                    "Live GPS tracking",
-                    "Secure vault storage",
-                    "Priority support",
-                  ],
-                  popular: true,
-                },
-                {
-                  title: "Enterprise",
-                  price: "Custom",
-                  desc: "For agencies and facilities",
-                  features: [
-                    "Everything in Premium",
-                    "Multiple family management",
-                    "Advanced analytics",
-                    "Custom integrations",
-                    "Dedicated account manager",
-                    "SLA guarantee",
-                  ],
-                  popular: false,
-                },
-              ].map((plan, i) => (
-                <motion.div
-                  key={plan.title}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  whileHover={{ y: -10 }}
-                  className={`relative p-8 rounded-3xl ${
-                    plan.popular
-                      ? "bg-gradient-to-br from-primary to-primary-600 text-white shadow-xl shadow-primary/30 scale-105"
-                      : "bg-white border border-gray-100 shadow-soft-xl"
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-sm font-bold rounded-full">
-                      Most Popular
-                    </div>
-                  )}
-                  <h3 className={`text-xl font-bold mb-2 ${plan.popular ? "text-white" : "text-gray-900"}`}>
-                    {plan.title}
-                  </h3>
-                  <p className={`text-sm mb-6 ${plan.popular ? "text-primary-100" : "text-gray-500"}`}>
-                    {plan.desc}
-                  </p>
-                  <div className="mb-8">
-                    <span className={`text-5xl font-extrabold font-heading ${plan.popular ? "text-white" : "text-gray-900"}`}>
-                      ${plan.price}
-                    </span>
-                    {plan.price !== "Custom" && (
-                      <span className={plan.popular ? "text-primary-100" : "text-gray-500"}>
-                        /month
-                      </span>
-                    )}
-                  </div>
-                  <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-3">
-                        <CheckCircle className={`w-5 h-5 ${plan.popular ? "text-accent" : "text-primary"}`} />
-                        <span className={plan.popular ? "text-primary-50" : "text-gray-600"}>
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/register" className="block">
-                    <Button
-                      variant={plan.popular ? "outline" : "default"}
-                      className={`w-full h-12 font-bold rounded-xl ${
-                        plan.popular
-                          ? "bg-white text-primary hover:bg-primary-50 border-0"
-                          : "btn-primary"
-                      }`}
-                    >
-                      Get Started
-                    </Button>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="py-24 bg-gradient-to-br from-primary via-primary-600 to-primary-700 relative overflow-hidden">
           <motion.div
@@ -956,12 +825,7 @@ className="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-soft-2xl bor
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="lg:col-span-1">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center">
-                  <Heart className="text-white w-6 h-6" />
-                </div>
-                <span className="text-2xl font-bold text-white tracking-tight font-heading">
-                  CareSphere
-                </span>
+                <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
               </div>
               <p className="max-w-sm text-gray-400 leading-relaxed mb-6">
                 Connecting families with vetted, compassionate caregivers through technology and

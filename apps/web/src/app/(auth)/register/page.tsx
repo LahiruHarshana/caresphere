@@ -945,6 +945,12 @@ function RegisterContent() {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="mb-6">
+        <a href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </a>
+      </div>
       {renderStepIndicator()}
 
       {error && (

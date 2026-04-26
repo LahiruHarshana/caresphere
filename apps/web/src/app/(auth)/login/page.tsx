@@ -93,10 +93,7 @@ export default function LoginPage() {
 
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
-              <HeartPulse className="w-7 h-7 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">CareSphere</span>
+            <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
           </div>
           <h2 className="text-4xl leading-tight font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-gray-600">

@@ -57,10 +57,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/customer/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-teal-400 rounded-lg flex items-center justify-center">
-                <HeartPulse className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">CareSphere</span>
+              <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
             </Link>
 
             {/* Navigation Links */}
