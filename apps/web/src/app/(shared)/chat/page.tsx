@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { ChatWindow } from '@/components/chat/chat-window';
-import { MessageCircle, ChevronLeft } from 'lucide-react';
+import { MessageCircle, ChevronLeft, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 interface UserProfile {
   id: string;
@@ -60,7 +61,12 @@ export default function ChatPage() {
   return (
     <div className="container mx-auto p-4 h-[calc(100vh-100px)]">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Your Conversations</h1>
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">Your Conversations</h1>
+        </div>
         <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
           {conversations.length} conversations
         </span>
