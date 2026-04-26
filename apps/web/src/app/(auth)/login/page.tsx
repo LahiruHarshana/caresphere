@@ -201,6 +201,9 @@ export default function LoginPage() {
                 <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("john.d@example.com")}>
                   Caregiver 2
                 </Button>
+                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("lisa.v@example.com")}>
+                  Lisa Vance
+                </Button>
               </div>
             </div>
           </div>

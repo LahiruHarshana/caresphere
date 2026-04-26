@@ -9,7 +9,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/payments/checkout-form";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_TYooMQauvdEDq54NiTphI7jx");
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 type Caregiver = {
   id: string;
@@ -115,6 +116,14 @@ export default function BookCaregiverPage() {
   };
 
   if (isLoading) return <div className="p-8 text-center">Loading...</div>;
+
+  if (!stripePromise) {
+    return (
+      <div className="p-8 text-center text-red-600">
+        Stripe is not configured. Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in apps/web/.env.local.
+      </div>
+    );
+  }
 
   if (success) {
     return (

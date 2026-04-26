@@ -29,9 +29,11 @@ export default function GigsPage() {
   };
 
   const pendingBookings = bookings.filter(b => b.status === "PENDING");
-  const confirmedBookings = bookings.filter(b => b.status === "CONFIRMED");
+const confirmedBookings = bookings.filter(b => b.status === "CONFIRMED" && new Date(b.scheduledAt) > now);
   const inProgressBookings = bookings.filter(b => b.status === "IN_PROGRESS");
-  const completedBookings = bookings.filter(b => b.status === "COMPLETED").slice(0, 5);
+  const completedBookings = bookings
+    .filter(b => b.status === "COMPLETED" && new Date(b.scheduledAt) < now)
+    .slice(0, 5);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
