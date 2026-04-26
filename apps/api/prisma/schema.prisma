@@ -113,6 +113,7 @@ model CaregiverProfile {
   specialties        String[]
   verificationStatus VerificationStatus @default(PENDING)
   backgroundCheckUrl String?
+  coverPhotoUrl      String?
   isAvailable        Boolean            @default(true)
   agreedToBackgroundCheck Boolean       @default(false)
   bio                String?

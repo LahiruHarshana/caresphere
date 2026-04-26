@@ -39,6 +39,25 @@ export class CaregiversService {
     });
   }
 
+  async uploadProfilePicture(userId: string, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
+    const result = await this.uploadsService.uploadImage(file, 'caresphere/profiles');
+    await this.prisma.profile.update({
+      where: { userId },
+      data: { avatarUrl: result.url },
+    });
+    return { avatarUrl: result.url };
+  }
+
+  async uploadCoverPhoto(userId: string, file: Express.Multer.File): Promise<{ coverPhotoUrl: string }> {
+    const result = await this.uploadsService.uploadImage(file, 'caresphere/covers');
+    await this.prisma.caregiverProfile.upsert({
+      where: { userId },
+      update: { coverPhotoUrl: result.url },
+      create: { userId, coverPhotoUrl: result.url },
+    });
+    return { coverPhotoUrl: result.url };
+  }
+
   async getPublicProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId, role: 'CAREGIVER' },

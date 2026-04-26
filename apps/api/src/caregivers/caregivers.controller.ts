@@ -63,6 +63,28 @@ export class CaregiversController {
     return this.caregiversService.uploadVerification(req.user.userId, file);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('CAREGIVER')
+  @Post('upload-avatar')
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async uploadAvatar(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    return this.caregiversService.uploadProfilePicture(req.user.userId, file);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('CAREGIVER')
+  @Post('upload-cover')
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async uploadCover(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    return this.caregiversService.uploadCoverPhoto(req.user.userId, file);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getPublicProfile(@Param('id') id: string) {

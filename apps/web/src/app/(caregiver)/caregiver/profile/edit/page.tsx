@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
-import { User, Briefcase, Save, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
+import { User, Briefcase, Save, ArrowLeft, CheckCircle, AlertCircle, Camera, Upload, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function CaregiverProfileEdit() {
@@ -13,6 +13,11 @@ export default function CaregiverProfileEdit() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -47,6 +52,60 @@ export default function CaregiverProfileEdit() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/caregivers/upload-avatar`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      
+      if (!res.ok) throw new Error('Upload failed');
+      
+      const data = await res.json();
+      setProfile({ ...profile, avatarUrl: data.avatarUrl });
+    } catch (err) {
+      console.error('Upload failed', err);
+      alert('Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/caregivers/upload-cover`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      
+      if (!res.ok) throw new Error('Upload failed');
+      
+      const data = await res.json();
+      setCaregiverProfile({ ...caregiverProfile, coverPhotoUrl: data.coverPhotoUrl });
+    } catch (err) {
+      console.error('Upload failed', err);
+      alert('Failed to upload cover photo');
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
@@ -58,7 +117,7 @@ export default function CaregiverProfileEdit() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Link href="/caregiver/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-teal-600 mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -84,6 +143,78 @@ export default function CaregiverProfileEdit() {
             <p className="font-medium text-green-800">Profile saved successfully!</p>
           </div>
         )}
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div className="relative h-48 bg-gradient-to-r from-teal-200 to-cyan-200">
+            {caregiverProfile.coverPhotoUrl ? (
+              <img src={caregiverProfile.coverPhotoUrl} alt="Cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <ImageIcon className="w-12 h-12 text-teal-300" />
+              </div>
+            )}
+            
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleCoverUpload}
+              className="hidden"
+            />
+            
+            <button
+              onClick={() => coverInputRef.current?.click()}
+              disabled={uploadingCover}
+              className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              {uploadingCover ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <Camera className="w-4 h-4" />
+              )}
+              {uploadingCover ? 'Uploading...' : 'Change Cover'}
+            </button>
+          </div>
+
+          <div className="px-6 pb-6">
+            <div className="relative -mt-16 mb-4">
+              <div className="w-32 h-32 rounded-2xl border-4 border-white bg-gradient-to-br from-teal-400 to-teal-600 shadow-lg overflow-hidden">
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold">
+                    {profile.firstName?.[0] || '?'}
+                  </div>
+                )}
+              </div>
+              
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+              
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute bottom-0 right-0 w-10 h-10 bg-teal-600 hover:bg-teal-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-colors"
+              >
+                {uploadingAvatar ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <Camera className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">{profile.firstName} {profile.lastName}</h2>
+              <p className="text-gray-500">Caregiver</p>
+            </div>
+          </div>
+        </div>
 
         <form onSubmit={handleSave} className="space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
