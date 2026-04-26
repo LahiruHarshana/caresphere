@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 import {
-  HeartPulse,
   Briefcase,
   DollarSign,
   Calendar,
@@ -31,7 +30,7 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-neutral-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -50,21 +49,18 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col">
-        {/* Logo */}
+    <div className="flex min-h-screen bg-neutral-50">
+      <div className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col">
         <div className="p-6 border-b border-gray-100">
           <Link href="/caregiver/dashboard" className="flex items-center gap-3">
             <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
             <div>
-              <h1 className="text-lg font-bold text-gray-900">CareSphere</h1>
-              <p className="text-xs text-gray-500">Caregiver Portal</p>
+              <h1 className="font-heading text-lg text-neutral">CareSphere</h1>
+              <p className="text-xs font-body text-neutral-400">Caregiver Portal</p>
             </div>
           </Link>
         </div>
 
-        {/* Nav Items */}
         <nav className="flex-1 p-4">
           <div className="space-y-1">
             {navItems.map((item) => {
@@ -74,13 +70,13 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-body transition-all duration-300 ${
                     isActive
-                      ? "bg-primary/10 text-primary border-l-4 border-primary"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-primary/10 text-primary border-l-2 border-primary"
+                      : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-gray-400"}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-neutral-300"}`} />
                   {item.label}
                 </Link>
               );
@@ -88,23 +84,22 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        {/* User Section */}
         <div className="p-4 border-t border-gray-100">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+            <div className="w-9 h-9 rounded-sm bg-primary/10 flex items-center justify-center text-primary font-heading text-sm">
               {user.firstName[0]}{user.lastName[0]}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
+              <p className="text-sm font-body text-neutral truncate">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              <p className="text-xs font-body text-neutral-400 truncate">{user.email}</p>
             </div>
             <NotificationBell />
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="flex items-center gap-3 w-full px-4 py-2.5 rounded-sm text-sm font-body text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors duration-300"
           >
             <LogOut className="w-4 h-4" />
             Logout
@@ -112,20 +107,17 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/caregiver/dashboard" className="flex items-center gap-2">
             <img src="/logo.png" alt="CareSphere" className="h-8 w-auto" />
           </Link>
-          <button onClick={logout} className="text-gray-500">
+          <button onClick={logout} className="text-neutral-400">
             <LogOut className="w-5 h-5" />
           </button>
         </div>
-        {/* Mobile Bottom Nav */}
       </div>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-auto md:p-8 p-4 pt-20 md:pt-8">
         <ErrorBoundary>
           {children}

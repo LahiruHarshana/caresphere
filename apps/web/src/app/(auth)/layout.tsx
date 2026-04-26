@@ -1,6 +1,5 @@
 "use client";
 
-import { HeartPulse } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -18,10 +17,10 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50/30 flex flex-col">
+    <div className="min-h-screen bg-neutral-50 flex flex-col">
       <header className="w-full py-6 px-8">
         <Link href="/" className="flex items-center gap-3 w-fit">
-          <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
+          <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
         </Link>
       </header>
 
@@ -29,18 +28,18 @@ export default function AuthLayout({
         <div className="w-full max-w-lg">{children}</div>
       </main>
 
-      <footer className="py-6 text-center text-sm text-gray-500">
-        <p>
-          &copy; {new Date().getFullYear()} CareSphere Inc. All rights reserved.
+      <footer className="py-6 text-center text-sm text-neutral-500">
+        <p className="font-body">
+          © {new Date().getFullYear()} CareSphere Inc. All rights reserved.
         </p>
-        <div className="flex items-center justify-center gap-4 mt-2">
-          <Link href="/privacy" className="hover:text-primary transition-colors">
+        <div className="flex items-center justify-center gap-6 mt-2 font-body">
+          <Link href="/privacy" className="hover:text-primary transition-colors duration-300">
             Privacy Policy
           </Link>
-          <Link href="/terms" className="hover:text-primary transition-colors">
+          <Link href="/terms" className="hover:text-primary transition-colors duration-300">
             Terms of Service
           </Link>
-          <Link href="/help" className="hover:text-primary transition-colors">
+          <Link href="/help" className="hover:text-primary transition-colors duration-300">
             Help
           </Link>
         </div>

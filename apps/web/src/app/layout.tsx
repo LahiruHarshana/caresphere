@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
-import Head from "next/head";
 import { AuthProvider } from "@/lib/auth-context";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { ToastProvider } from "@/components/ui/toast";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500"],
   variable: "--font-heading",
   display: "swap",
 });
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400"],
   variable: "--font-body",
   display: "swap",
 });
@@ -58,7 +57,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/favicon_io/android-chrome-512x512.png" />
       </head>
       <body
-        className={`${plusJakarta.variable} ${outfit.variable} font-body antialiased`}
+        className={`${cormorant.variable} ${inter.variable} font-body antialiased`}
         suppressHydrationWarning
       >
         <ErrorBoundary>

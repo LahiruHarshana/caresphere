@@ -5,14 +5,14 @@ interface SkeletonProps {
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
-      className={`animate-pulse bg-gray-200 rounded-md ${className || ""}`}
+      className={`skeleton ${className || ""}`}
     />
   );
 }
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border p-6 space-y-4">
+    <div className="bg-white rounded-sm shadow-soft-sm border p-6 space-y-4">
       <div className="flex items-center gap-3">
         <Skeleton className="w-12 h-12 rounded-full" />
         <div className="flex-1 space-y-2">
@@ -32,7 +32,7 @@ export function CardSkeleton() {
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="bg-white rounded-xl border">
+    <div className="bg-white rounded-sm border">
       <div className="border-b p-4">
         <div className="flex gap-4">
           {Array(cols).fill(0).map((_, i) => (
@@ -59,7 +59,7 @@ export function DashboardSkeleton() {
       <Skeleton className="h-10 w-64" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-xl p-6 border space-y-3">
+          <div key={i} className="bg-white rounded-sm p-6 border space-y-3">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-8 w-16" />
           </div>

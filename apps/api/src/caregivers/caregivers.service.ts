@@ -53,7 +53,14 @@ export class CaregiversService {
     await this.prisma.caregiverProfile.upsert({
       where: { userId },
       update: { coverPhotoUrl: result.url },
-      create: { userId, coverPhotoUrl: result.url },
+      create: {
+        userId,
+        coverPhotoUrl: result.url,
+        hourlyRate: 0,
+        experienceYears: 0,
+        certifications: [],
+        specialties: [],
+      },
     });
     return { coverPhotoUrl: result.url };
   }

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Heart, FileText, LogOut, Shield, CalendarCheck } from "lucide-react";
+import { LayoutDashboard, Users, Heart, FileText, LogOut, CalendarCheck } from "lucide-react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function AdminLayout({
@@ -24,8 +24,8 @@ export default function AdminLayout({
   }, [user, isLoading, router]);
 
   if (isLoading) return (
-    <div className="flex items-center justify-center h-screen bg-gray-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
+    <div className="flex items-center justify-center h-screen bg-neutral-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     </div>
   );
   if (!user || user.role !== "ADMIN") return null;
@@ -39,21 +39,19 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <div className="w-72 bg-gradient-to-b from-teal-800 to-teal-900 text-white flex flex-col shadow-xl">
-        <div className="p-8 border-b border-teal-700/50">
+    <div className="flex min-h-screen bg-neutral-50">
+      <div className="w-64 bg-neutral-900 text-white flex flex-col">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-              <Shield className="w-7 h-7 text-amber-400" />
-            </div>
+            <img src="/logo.png" alt="CareSphere" className="h-8 w-auto brightness-0 invert" />
             <div>
-              <h1 className="text-xl font-bold">Admin Center</h1>
-              <p className="text-xs text-teal-300">CareSphere Platform</p>
+              <h1 className="font-heading text-lg text-white">Admin Center</h1>
+              <p className="text-xs text-white/50 font-body">CareSphere Platform</p>
             </div>
           </div>
         </div>
         <nav className="flex-1 p-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -61,23 +59,23 @@ export default function AdminLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  className={`sidebar-dark nav-item flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-body transition-all duration-300 ${
                     isActive 
-                      ? "bg-white/20 border-l-4 border-amber-400" 
-                      : "hover:bg-white/10"
+                      ? "bg-white/10 text-white border-l-2 border-primary" 
+                      : ""
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-amber-400' : 'text-teal-200'}`} />
-                  <span className={isActive ? 'font-semibold' : ''}>{item.label}</span>
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : ''}`} />
+                  {item.label}
                 </Link>
               );
             })}
           </div>
         </nav>
-        <div className="p-4 border-t border-teal-700/50">
+        <div className="p-4 border-t border-white/10">
           <button
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-teal-200 hover:text-white"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-sm hover:bg-white/10 transition-colors duration-300 text-white/70 hover:text-white font-body text-sm"
           >
             <LogOut className="w-5 h-5" />
             Logout

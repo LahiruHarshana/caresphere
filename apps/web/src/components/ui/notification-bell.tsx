@@ -40,20 +40,20 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
+        className="relative p-2 text-gray-600 hover:text-neutral transition-colors"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-50">
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
           <div className="p-4 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <h3 className="font-semibold text-neutral">Notifications</h3>
           </div>
           {notifications.length === 0 ? (
             <div className="p-6 text-center text-gray-500 text-sm">
@@ -63,7 +63,7 @@ export function NotificationBell() {
             <div className="max-h-80 overflow-y-auto">
               {notifications.map((n) => (
                 <div key={n.id} className="p-4 border-b border-gray-50 hover:bg-gray-50">
-                  <p className="font-medium text-sm text-gray-900">{n.title}</p>
+                  <p className="font-medium text-sm text-neutral">{n.title}</p>
                   <p className="text-xs text-gray-500 mt-1">{n.body}</p>
                 </div>
               ))}

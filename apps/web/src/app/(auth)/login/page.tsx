@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, HeartPulse } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -49,19 +49,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 relative overflow-hidden flex">
-      <div className="pointer-events-none absolute -top-28 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
-
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary to-primary-700">
+    <div className="min-h-screen bg-neutral-50 flex">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-neutral-900">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center opacity-20 grayscale"
           style={{ backgroundImage: `url(${loginSideImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/55 to-primary-900/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/90 via-neutral-900/70 to-primary-900/70" />
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
-          <h1 className="text-5xl font-bold mb-6">Welcome Back to CareSphere</h1>
-          <p className="text-xl text-primary-100 mb-8">
+          <h1 className="font-heading text-5xl mb-6 tracking-tight">Welcome Back to CareSphere</h1>
+          <p className="text-lg text-white/70 mb-12 font-body leading-relaxed">
             Continue your journey to find the perfect care for your loved ones.
           </p>
           <div className="flex items-center gap-4">
@@ -69,139 +66,120 @@ export default function LoginPage() {
               {["S", "M", "D", "J"].map((initial, i) => (
                 <div
                   key={i}
-                  className="w-12 h-12 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center"
+                  className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center"
                 >
-                  <span className="text-sm font-bold">{initial}</span>
+                  <span className="text-sm font-body">{initial}</span>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-primary-100">Joined by 10,000+ families</p>
+            <p className="text-sm text-white/60 font-body">Joined by 10,000+ families</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 relative z-10 flex flex-col justify-center py-10 px-6 sm:px-8 lg:px-16">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm backdrop-blur hover:bg-white hover:text-slate-900 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to home
+      <div className="flex-1 relative z-10 flex flex-col justify-center py-10 px-6 sm:px-8 lg:px-16 max-w-xl mx-auto">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 rounded-sm border border-gray-200 bg-white px-4 py-2 text-sm font-body text-neutral-600 hover:bg-neutral-50 transition-colors duration-300 mb-8 w-fit"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to home
+        </Link>
+
+        <div className="flex items-center gap-3 mb-8">
+          <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
+        </div>
+        <h2 className="font-heading text-3xl text-neutral tracking-tight mb-2">Sign in to your account</h2>
+        <p className="text-neutral-600 font-body mb-8">
+          Or{" "}
+          <Link href="/register?role=CUSTOMER" className="text-primary hover:underline">
+            create a new account
           </Link>
-        </div>
+        </p>
 
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="flex items-center gap-3 mb-5">
-            <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
-          </div>
-          <h2 className="text-4xl leading-tight font-extrabold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-gray-600">
-            Or{" "}
-            <Link href="/register?role=CUSTOMER" className="text-primary hover:text-primary-600 font-medium">
-              create a new account
-            </Link>
-          </p>
-        </div>
+        <div className="bg-white p-8 rounded-sm border border-gray-100 shadow-soft-sm">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-sm">
+                <p className="text-sm text-red-700 font-body">{error}</p>
+              </div>
+            )}
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white/85 backdrop-blur-sm py-8 px-6 shadow-2xl shadow-slate-300/40 rounded-2xl border border-white/70 ring-1 ring-slate-100">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-700">{error}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div>
+              <Label htmlFor="email">Email address</Label>
+              <div className="mt-2">
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
 
-              <div>
-                <Label htmlFor="email">Email address</Label>
-                <div className="mt-1">
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <div className="mt-2">
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded-sm"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-neutral-600 font-body">
+                  Remember me
+                </label>
               </div>
 
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="mt-1">
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+              <div className="text-sm">
+                <Link href="/forgot-password" className="text-primary hover:underline font-body">
+                  Forgot your password?
+                </Link>
               </div>
+            </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                    Remember me
-                  </label>
-                </div>
+            <div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
+            </div>
+          </form>
 
-                <div className="text-sm">
-                  <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                    Forgot your password?
-                  </Link>
-                </div>
-              </div>
-
-              <div>
-                <Button type="submit" className="w-full flex justify-center" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign in"}
-                </Button>
-              </div>
-            </form>
-
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-500 mb-4 text-center">Developer Quick Login</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("admin@caresphere.com")}>
-                  Admin
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("customer1@example.com")}>
-                  Customer
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("sarah.c@example.com")}>
-                  Caregiver 1
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("john.d@example.com")}>
-                  Caregiver 2
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("lisa.v@example.com")}>
-                  Lisa Vance
-                </Button>
-              </div>
+          <div className="mt-8 pt-6 border-t border-gray-100">
+            <h3 className="text-xs font-body text-neutral-500 mb-4 text-center uppercase tracking-wider">Developer Quick Login</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("admin@caresphere.com")}>
+                Admin
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("customer1@example.com")}>
+                Customer
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("sarah.c@example.com")}>
+                Caregiver 1
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("john.d@example.com")}>
+                Caregiver 2
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("lisa.v@example.com")}>
+                Lisa Vance
+              </Button>
             </div>
           </div>
         </div>

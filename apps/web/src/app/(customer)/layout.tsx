@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 import {
-  HeartPulse,
   Search,
   CalendarCheck,
   MessageCircle,
@@ -15,7 +14,6 @@ import {
   LogOut,
   Home,
 } from "lucide-react";
-import { NotificationBell } from "@/components/ui/notification-bell";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
@@ -31,7 +29,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
+      <div className="flex items-center justify-center h-screen bg-neutral-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -50,17 +48,14 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Navbar */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <Link href="/customer/dashboard" className="flex items-center gap-2">
               <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
             </Link>
 
-            {/* Navigation Links */}
             <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -69,10 +64,10 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-body transition-all duration-300 ${
                       isActive
                         ? "bg-primary/10 text-primary"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -82,14 +77,13 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
               })}
             </nav>
 
-            {/* User Menu */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 hidden sm:block">
+            <div className="flex items-center gap-6">
+              <span className="text-sm font-body text-neutral-600 hidden sm:block">
                 Hi, {user.firstName}
               </span>
               <button
                 onClick={logout}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 transition-colors"
+                className="flex items-center gap-2 text-sm font-body text-neutral-400 hover:text-red-500 transition-colors duration-300"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Logout</span>
@@ -98,7 +92,6 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         <nav className="md:hidden border-t border-gray-100 overflow-x-auto">
           <div className="flex px-4 py-2 gap-1">
             {navItems.slice(0, 5).map((item) => {
@@ -108,8 +101,8 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap ${
-                    isActive ? "bg-primary/10 text-primary" : "text-gray-500"
+                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-sm text-xs font-body whitespace-nowrap ${
+                    isActive ? "bg-primary/10 text-primary" : "text-neutral-500"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -121,8 +114,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
         </nav>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-8 py-8">
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

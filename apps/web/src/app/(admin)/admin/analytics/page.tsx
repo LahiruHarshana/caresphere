@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
-import { Users, CheckCircle, Clock, DollarSign, TrendingUp, Activity, PieChart as PieChartIcon } from "lucide-react";
+import { Users, CheckCircle, Clock, DollarSign, TrendingUp, Activity } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 
 type AnalyticsData = {
@@ -52,13 +52,13 @@ export default function AnalyticsPage() {
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     </div>
   );
-  if (!data) return <div className="text-center p-8 text-gray-500">Error loading data.</div>;
+  if (!data) return <div className="text-center p-8 text-gray-500 font-body">Error loading data.</div>;
 
   const cards = [
-    { label: "Total Users", value: data.stats.totalUsers.toLocaleString(), icon: Users, color: "from-blue-500 to-blue-600", bgColor: "bg-blue-50", textColor: "text-blue-600" },
-    { label: "Total Bookings", value: data.stats.totalBookings.toLocaleString(), icon: CheckCircle, color: "from-green-500 to-green-600", bgColor: "bg-green-50", textColor: "text-green-600" },
-    { label: "Pending Verifications", value: data.stats.pendingVerifications.toLocaleString(), icon: Clock, color: "from-amber-500 to-amber-600", bgColor: "bg-amber-50", textColor: "text-amber-600" },
-    { label: "Total Revenue", value: `$${data.stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: "from-teal-500 to-teal-600", bgColor: "bg-teal-50", textColor: "text-teal-600" },
+    { label: "Total Users", value: data.stats.totalUsers.toLocaleString(), icon: Users, bgColor: "bg-primary/10", textColor: "text-primary" },
+    { label: "Total Bookings", value: data.stats.totalBookings.toLocaleString(), icon: CheckCircle, bgColor: "bg-green-50", textColor: "text-green-600" },
+    { label: "Pending Verifications", value: data.stats.pendingVerifications.toLocaleString(), icon: Clock, bgColor: "bg-amber-50", textColor: "text-amber-600" },
+    { label: "Total Revenue", value: `$${data.stats.totalRevenue.toLocaleString()}`, icon: DollarSign, bgColor: "bg-primary/10", textColor: "text-primary" },
   ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a288ff'];
@@ -81,10 +81,10 @@ export default function AnalyticsPage() {
     <div className="space-y-8 pb-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-          <p className="text-gray-500 mt-1">Overview of your platform performance</p>
+          <h1 className="text-3xl font-heading text-neutral tracking-tight">Analytics Dashboard</h1>
+          <p className="text-neutral-500 mt-1 font-body">Overview of your platform performance</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-teal-600 bg-teal-50 px-4 py-2 rounded-full">
+        <div className="flex items-center gap-2 text-xs font-body text-primary bg-primary/10 px-4 py-2 rounded-full uppercase tracking-wider">
           <Activity className="w-4 h-4" />
           Live Data
         </div>
@@ -94,24 +94,24 @@ export default function AnalyticsPage() {
         {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.label} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
+            <div key={card.label} className="bg-white p-6 rounded-sm border border-gray-100 hover:shadow-lg transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl ${card.bgColor} flex items-center justify-center`}>
+                <div className={`w-12 h-12 rounded-sm ${card.bgColor} flex items-center justify-center`}>
                   <Icon className={`w-6 h-6 ${card.textColor}`} />
                 </div>
                 <TrendingUp className="w-5 h-5 text-green-500" />
               </div>
-              <div className="text-sm font-medium text-gray-500">{card.label}</div>
-              <div className="mt-1 text-3xl font-bold text-gray-900">{card.value}</div>
+              <div className="stat-admin-label">{card.label}</div>
+              <div className="stat-admin-number">{card.value}</div>
             </div>
           );
         })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white p-8 rounded-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Monthly Revenue</h2>
+            <h2 className="text-lg font-heading text-neutral tracking-tight">Monthly Revenue</h2>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -120,18 +120,18 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} tickFormatter={(val) => `$${val}`} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '4px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   formatter={(value: any) => [`$${value}`, 'Revenue']}
                 />
-                <Line type="monotone" dataKey="revenue" stroke="#0d9488" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="revenue" stroke="#0d9488" strokeWidth={2} dot={{ r: 3, strokeWidth: 2 }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white p-8 rounded-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">New Users</h2>
+            <h2 className="text-lg font-heading text-neutral tracking-tight">New Users</h2>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -140,18 +140,18 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '4px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   cursor={{ fill: '#f8fafc' }}
                 />
-                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" fill="#0d9488" radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white p-8 rounded-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Booking Status</h2>
+            <h2 className="text-lg font-heading text-neutral tracking-tight">Booking Status</h2>
           </div>
           <div className="h-72 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -160,8 +160,8 @@ export default function AnalyticsPage() {
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={50}
+                  outerRadius={80}
                   fill="#8884d8"
                   paddingAngle={5}
                   dataKey="value"
@@ -177,28 +177,28 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white p-8 rounded-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+            <h2 className="text-lg font-heading text-neutral tracking-tight">Recent Activity</h2>
           </div>
           <div className="space-y-4 overflow-y-auto max-h-72">
             {data.recentLogs.map((log) => (
-              <div key={log.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
+              <div key={log.id} className="flex items-start gap-3 p-3 rounded-sm hover:bg-neutral-50 transition-colors duration-300">
+                <div className="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                   <Activity className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-body text-neutral">
                     {log.admin.profile?.firstName} {log.action}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-neutral-400 mt-1 font-body">
                     {new Date(log.createdAt).toLocaleString()} • Target: {log.targetType} {log.targetId.substring(0, 8)}
                   </p>
                 </div>
               </div>
             ))}
             {data.recentLogs.length === 0 && (
-              <p className="text-gray-500 text-center py-4">No recent activity.</p>
+              <p className="text-neutral-400 text-center py-4 font-body">No recent activity.</p>
             )}
           </div>
         </div>
