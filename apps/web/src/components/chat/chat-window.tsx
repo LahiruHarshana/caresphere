@@ -23,7 +23,7 @@ interface Message {
 export const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, otherUser, token, bookingId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const { socket } = useSocket('chat', token);
+  const { socket } = useSocket('chat', token, currentUser.id);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -35,14 +35,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentUser, otherUser, 
       setMessages((prev) => [...prev, message]);
     });
 
-    socket.on('typing', (data: { userId: string; isTyping: boolean }) => {
-      if (data.userId === otherUser.id) {
+    socket.on('typing', (data: { senderId: string; isTyping: boolean }) => {
+      if (data.senderId === otherUser.id) {
         setIsTyping(data.isTyping);
       }
     });
 
     // Fetch initial history (I should probably have an API endpoint for this)
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/chat/history/${otherUser.id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/chat/${otherUser.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

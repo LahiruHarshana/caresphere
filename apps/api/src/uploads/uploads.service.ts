@@ -5,11 +5,24 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UploadsService {
   constructor(private config: ConfigService) {
-    cloudinary.config({
-      cloud_name: this.config.get('CLOUDINARY_CLOUD_NAME'),
-      api_key: this.config.get('CLOUDINARY_API_KEY'),
-      api_secret: this.config.get('CLOUDINARY_API_SECRET'),
-    });
+    const cloudinaryUrl = this.config.get('CLOUDINARY_URL') || '';
+    
+    if (cloudinaryUrl) {
+      const match = cloudinaryUrl.match(/cloudinary:\/\/([^:]+):([^@]+)@(.+)/);
+      if (match) {
+        cloudinary.config({
+          api_key: match[1],
+          api_secret: match[2],
+          cloud_name: match[3],
+        });
+      }
+    } else {
+      cloudinary.config({
+        cloud_name: this.config.get('CLOUDINARY_CLOUD_NAME'),
+        api_key: this.config.get('CLOUDINARY_API_KEY'),
+        api_secret: this.config.get('CLOUDINARY_API_SECRET'),
+      });
+    }
   }
 
   async uploadImage(

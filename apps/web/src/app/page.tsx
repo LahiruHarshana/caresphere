@@ -747,7 +747,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="/register?role=CAREGIVER">
-                <Button className="btn-cta h-14 px-10 text-sm bg-white text-primary border-white hover:bg-gray-100">
+                <Button variant="outline-light" className="btn-cta h-14 px-10 text-sm">
                   Join as a Caregiver
                   <Users2 className="w-4 h-4 ml-2" />
                 </Button>

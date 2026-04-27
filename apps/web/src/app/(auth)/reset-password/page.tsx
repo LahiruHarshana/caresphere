@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,9 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { CheckCircle, AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 
-export default function ResetPasswordPage() {
+export const dynamic = "force-dynamic";
+
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   
@@ -119,5 +121,21 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

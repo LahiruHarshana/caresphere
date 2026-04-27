@@ -41,9 +41,15 @@ export class CaregiversService {
 
   async uploadProfilePicture(userId: string, file: Express.Multer.File): Promise<{ avatarUrl: string }> {
     const result = await this.uploadsService.uploadImage(file, 'caresphere/profiles');
-    await this.prisma.profile.update({
+    await this.prisma.profile.upsert({
       where: { userId },
-      data: { avatarUrl: result.url },
+      update: { avatarUrl: result.url },
+      create: {
+        userId,
+        firstName: (await this.prisma.user.findUnique({ where: { id: userId } }))?.email.split('@')[0] || 'User',
+        lastName: '',
+        avatarUrl: result.url,
+      },
     });
     return { avatarUrl: result.url };
   }

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-export default function VerifyEmailPage() {
+export const dynamic = "force-dynamic";
+
+function VerifyEmailForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -61,5 +63,21 @@ export default function VerifyEmailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <VerifyEmailForm />
+    </Suspense>
   );
 }

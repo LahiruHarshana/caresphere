@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-export function useSocket(namespace: string, token: string | null) {
+export function useSocket(namespace: string, token: string | null, userId?: string) {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -13,7 +13,7 @@ export function useSocket(namespace: string, token: string | null) {
     if (!token) return;
 
     const socket = io(`${API_URL}/${namespace}`, {
-      auth: { token },
+      auth: { token, userId },
       transports: ["websocket"],
       reconnection: true,
       reconnectionDelay: 1000,
@@ -29,7 +29,7 @@ export function useSocket(namespace: string, token: string | null) {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [namespace, token]);
+  }, [namespace, token, userId]);
 
   return { socket: socketRef.current, isConnected };
 }

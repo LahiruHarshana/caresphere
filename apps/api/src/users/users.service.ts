@@ -35,6 +35,26 @@ export class UsersService {
     });
   }
 
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      id: user.id,
+      profile: {
+        firstName: user.profile?.firstName || '',
+        lastName: user.profile?.lastName || '',
+        avatarUrl: user.profile?.avatarUrl || null,
+      },
+    };
+  }
+
   async create(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({
       data,

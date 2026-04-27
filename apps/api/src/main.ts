@@ -11,7 +11,17 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
   
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://*.youtube.com", "https://*.google.com", "https://www.google.com", "https://apis.google.com", "https://ssl.gstatic.com", "https://www.gstatic.com"],
+        'frame-src': ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://*.youtube.com"],
+        'connect-src': ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://*.youtube.com", "https://*.google.com", "https://jnn-pa.googleapis.com"],
+        'img-src': ["'self'", "data:", "https:", "https://*.google.com", "https://*.googleusercontent.com"],
+      },
+    },
+  }));
   app.use(compression());
 
   app.useGlobalFilters(new AllExceptionsFilter());

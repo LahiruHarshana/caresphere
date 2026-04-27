@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UseGuards, UseInterceptors, UploadedFile, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UsersService } from './users.service';
@@ -9,6 +9,36 @@ import { UpdateCustomerProfileDto } from './dto/customer-profile.dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard')
+  async getDashboard(@Req() req: any) {
+    return this.usersService.getCustomerDashboard(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@Req() req: any) {
+    return this.usersService.getProfile(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('customer-profile')
+  async getCustomerProfile(@Req() req: any) {
+    return this.usersService.getCustomerProfile(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  async upsertProfile(@Req() req: any, @Body() data: UpdateProfileDto) {
+    return this.usersService.upsertProfile(req.user.userId, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('customer-profile')
+  async upsertCustomerProfile(@Req() req: any, @Body() data: UpdateCustomerProfileDto) {
+    return this.usersService.upsertCustomerProfile(req.user.userId, data);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('avatar')
@@ -23,32 +53,8 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  async getProfile(@Req() req: any) {
-    return this.usersService.getProfile(req.user.userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('profile')
-  async upsertProfile(@Req() req: any, @Body() data: UpdateProfileDto) {
-    return this.usersService.upsertProfile(req.user.userId, data);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('dashboard')
-  async getDashboard(@Req() req: any) {
-    return this.usersService.getCustomerDashboard(req.user.userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('customer-profile')
-  async getCustomerProfile(@Req() req: any) {
-    return this.usersService.getCustomerProfile(req.user.userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('customer-profile')
-  async upsertCustomerProfile(@Req() req: any, @Body() data: UpdateCustomerProfileDto) {
-    return this.usersService.upsertCustomerProfile(req.user.userId, data);
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(id);
   }
 }
