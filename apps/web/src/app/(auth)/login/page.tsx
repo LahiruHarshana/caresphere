@@ -5,8 +5,9 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const loginSideImage = "/media/images/login-side.jpg";
@@ -49,90 +50,148 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
-      <div className="hidden lg:flex lg:w-1/2 relative bg-neutral-900">
+    <div className="min-h-screen bg-[#0f172a] flex overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, x: -40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden lg:flex lg:w-1/2 relative flex-col justify-center px-16"
+      >
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20 grayscale"
           style={{ backgroundImage: `url(${loginSideImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/90 via-neutral-900/70 to-primary-900/70" />
-        <div className="relative z-10 flex flex-col justify-center px-16 text-white">
-          <h1 className="font-heading text-5xl mb-6 tracking-tight">Welcome Back to CareSphere</h1>
-          <p className="text-lg text-white/70 mb-12 font-body leading-relaxed">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/90 via-[#0f172a]/70 to-[#0f766e]/70" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-15"
+            style={{
+              background: "radial-gradient(circle, rgba(13, 148, 136, 0.5) 0%, transparent 70%)",
+              filter: "blur(60px)"
+            }}
+          />
+        </div>
+        <div className="relative z-10">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="page-hero-label mb-8"
+          >
+            Trusted by 10,000+ Families
+          </motion.span>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="font-heading text-4xl lg:text-5xl text-white tracking-tight mb-6 leading-tight"
+          >
+            Welcome back to <span className="text-[#5eead4]">CareSphere</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-white/60 text-lg font-body leading-relaxed mb-12 max-w-md"
+          >
             Continue your journey to find the perfect care for your loved ones.
-          </p>
-          <div className="flex items-center gap-4">
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="flex items-center gap-4"
+          >
             <div className="flex -space-x-3">
               {["S", "M", "D", "J"].map((initial, i) => (
                 <div
                   key={i}
                   className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center"
                 >
-                  <span className="text-sm font-body">{initial}</span>
+                  <span className="text-sm font-body text-white/80">{initial}</span>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-white/60 font-body">Joined by 10,000+ families</p>
-          </div>
+            <p className="text-sm text-white/50 font-body">Joined by thousands of families</p>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex-1 relative z-10 flex flex-col justify-center py-10 px-6 sm:px-8 lg:px-16 max-w-xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="flex-1 relative z-10 flex flex-col justify-center py-16 px-8 lg:px-16 max-w-xl mx-auto lg:mx-0 lg:ml-auto"
+      >
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-sm border border-gray-200 bg-white px-4 py-2 text-sm font-body text-neutral-600 hover:bg-neutral-50 transition-colors duration-300 mb-8 w-fit"
+          className="inline-flex items-center gap-2 text-sm font-body text-white/40 hover:text-white transition-colors duration-300 mb-10 w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
         </Link>
 
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-10">
           <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
         </div>
-        <h2 className="font-heading text-3xl text-neutral tracking-tight mb-2">Sign in to your account</h2>
-        <p className="text-neutral-600 font-body mb-8">
+
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="font-heading text-3xl text-white tracking-tight mb-2"
+        >
+          Sign in to your account
+        </motion.h2>
+        <p className="text-white/50 font-body mb-10">
           Or{" "}
-          <Link href="/register?role=CUSTOMER" className="text-primary hover:underline">
+          <Link href="/register?role=CUSTOMER" className="text-[#5eead4] hover:underline">
             create a new account
           </Link>
         </p>
 
-        <div className="bg-white p-8 rounded-sm border border-gray-100 shadow-soft-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="inner-card p-10"
+        >
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-sm">
-                <p className="text-sm text-red-700 font-body">{error}</p>
+              <div className="bg-red-500/10 border border-red-500/20 rounded-sm p-4">
+                <p className="text-sm text-red-400 font-body">{error}</p>
               </div>
             )}
 
             <div>
-              <Label htmlFor="email">Email address</Label>
-              <div className="mt-2">
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+              <Label htmlFor="email" className="text-white/70 text-sm font-body mb-2 block">Email address</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#0d9488] focus:ring-[#0d9488]/20 rounded-sm"
+              />
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="mt-2">
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+              <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#0d9488] focus:ring-[#0d9488]/20 rounded-sm"
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -141,49 +200,59 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded-sm"
+                  className="h-4 w-4 text-[#0d9488] focus:ring-[#0d9488] border-white/20 rounded-sm bg-transparent"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-neutral-600 font-body">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-white/50 font-body">
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <Link href="/forgot-password" className="text-primary hover:underline font-body">
+                <Link href="/forgot-password" className="text-[#5eead4] hover:underline font-body">
                   Forgot your password?
                 </Link>
               </div>
             </div>
 
-            <div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-            </div>
+            <Button type="submit" className="w-full bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488]" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
+              )}
+            </Button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <h3 className="text-xs font-body text-neutral-500 mb-4 text-center uppercase tracking-wider">Developer Quick Login</h3>
+          <div className="mt-8 pt-8 border-t border-white/5">
+            <h3 className="text-xs font-body text-white/30 mb-4 text-center uppercase tracking-widest">Developer Quick Login</h3>
             <div className="grid grid-cols-2 gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("admin@caresphere.com")}>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("admin@caresphere.com")}
+                className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm text-xs">
                 Admin
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("customer1@example.com")}>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("customer1@example.com")}
+                className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm text-xs">
                 Customer
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("sarah.c@example.com")}>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("sarah.c@example.com")}
+                className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm text-xs">
                 Caregiver 1
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("john.d@example.com")}>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("john.d@example.com")}
+                className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm text-xs">
                 Caregiver 2
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("lisa.v@example.com")}>
+              <Button type="button" variant="outline" size="sm" onClick={() => handleDemoFill("lisa.v@example.com")}
+                className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm text-xs">
                 Lisa Vance
               </Button>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

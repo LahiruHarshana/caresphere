@@ -83,6 +83,10 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.7;
 }
 
+.text-neutral {
+  color: #0f172a;
+}
+
 /* ─── Glassmorphism ─────────────────────────────────────────────────────────── */
 .glass {
   background: rgba(255, 255, 255, 0.05);
@@ -657,6 +661,186 @@ h1, h2, h3, h4, h5, h6 {
   color: #0f172a;
 }
 
+/* ─── Page Wrapper / Inner Page Hero ─────────────────────────────────────────────── */
+.page-hero {
+  background: #0f172a;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.page-hero::after {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.15) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.page-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.page-hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(13, 148, 136, 0.15);
+  color: #5eead4;
+  border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+.page-hero-title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.page-hero-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+/* ─── Page Content Areas ─────────────────────────────────────────────── */
+.page-content {
+  background: var(--surface);
+  min-height: 100vh;
+}
+
+/* ─── Inner Card / Panel ─────────────────────────────────────────────── */
+.inner-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 300ms ease;
+}
+
+.inner-card:hover {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.inner-card-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.inner-card-body {
+  padding: 2rem;
+}
+
+.inner-card-title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Stat Tile ─────────────────────────────────────────────── */
+.stat-tile {
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem 2rem;
+  transition: all 300ms ease;
+}
+
+.stat-tile:hover {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  border-color: rgba(13, 148, 136, 0.2);
+}
+
+.stat-tile-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.stat-tile-number {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: #0d9488;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.stat-tile-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* ─── Info List Item ─────────────────────────────────────────────── */
+.info-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 300ms ease;
+}
+
+.info-list-item:last-child {
+  border-bottom: none;
+}
+
+.info-list-item:hover {
+  background: #f8fafc;
+  margin: 0 -1rem;
+  padding: 1.25rem 1rem;
+}
+
+/* ─── Empty State ─────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
 /* ─── Progress Bar ───────────────────────────────────────────────────────────── */
 .progress-bar {
   height: 4px;
@@ -670,4 +854,301 @@ h1, h2, h3, h4, h5, h6 {
   background: #0d9488;
   border-radius: 2px;
   transition: width 300ms ease;
+}
+
+/* ─── App Shell — Dark Navigation Bar ───────────────────────────────────── */
+.app-nav {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.app-nav-link {
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  transition: all 300ms ease;
+  padding: 0.5rem 0.875rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-nav-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-nav-link.active {
+  color: white;
+  background: rgba(13, 148, 136, 0.2);
+  border: 1px solid rgba(13, 148, 136, 0.3);
+}
+
+.app-nav-user {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.app-nav-logo {
+  height: 36px;
+  width: auto;
+}
+
+/* ─── App Section Header ─────────────────────────────────────────────── */
+.app-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.app-section-title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+/* ─── App Action Card ─────────────────────────────────────────────── */
+.app-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  transition: all 300ms ease;
+  text-decoration: none;
+}
+
+.app-action-row:hover {
+  background: #f8fafc;
+  border-color: rgba(13, 148, 136, 0.3);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+.app-action-row-label {
+  font-size: 0.875rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-action-row-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 300ms ease;
+}
+
+.app-action-row:hover .app-action-row-arrow {
+  color: #0d9488;
+  transform: translateX(4px);
+}
+
+/* ─── Status Badge ─────────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.status-badge-primary {
+  background: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+}
+
+.status-badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.status-badge-pending {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.status-badge-neutral {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* ─── Tip / Insight Card ─────────────────────────────────────────────── */
+.tip-card {
+  background: #0f172a;
+  border-radius: 4px;
+  padding: 1.5rem 2rem;
+}
+
+.tip-card-title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.125rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.tip-card-body {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* ─── Table Row ─────────────────────────────────────────────── */
+.table-row {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 200ms ease;
+}
+
+.table-row:hover {
+  background: #f8fafc;
+}
+
+/* ─── Sidebar Quick Actions Panel ─────────────────────────────────────────────── */
+.quick-actions-panel {
+  background: #0f172a;
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.quick-actions-panel-title {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.125rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.quick-action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  transition: all 300ms ease;
+  text-decoration: none;
+}
+
+.quick-action-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  padding-left: 1.25rem;
+}
+
+/* ─── Mix-blend for Nav ─────────────────────────────────────────────────────── */
+.mix-blend-nav {
+  mix-blend-mode: difference;
+}
+
+/* ─── Badge ─────────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-teal {
+  background: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+}
+
+.badge-navy {
+  background: #0f172a;
+  color: white;
+}
+
+/* ─── Admin Dashboard Stat ──────────────────────────────────────────────────── */
+.stat-admin-number {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: #0d9488;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.stat-admin-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* ─── Caregiver Profile ─────────────────────────────────────────────────────── */
+.profile-card {
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 300ms ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Booking Card ───────────────────────────────────────────────────────────── */
+.booking-card {
+  border-radius: 4px;
+  transition: all 300ms ease;
+}
+
+.booking-card:hover {
+  border-color: rgba(13, 148, 136, 0.3);
+}
+
+/* ─── Tab Navigation ─────────────────────────────────────────────────────────── */
+.tab-item {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  transition: all 300ms ease;
+}
+
+.tab-item:hover {
+  color: #0f172a;
+}
+
+.tab-item.active {
+  color: #0d9488;
+  border-bottom-color: #0d9488;
+}
+
+/* ─── Chat Bubble ───────────────────────────────────────────────────────────── */
+.chat-bubble {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.chat-bubble-sent {
+  background: #0f172a;
+  color: white;
+  margin-left: auto;
+}
+
+.chat-bubble-received {
+  background: #f1f5f9;
+  color: #0f172a;
 }

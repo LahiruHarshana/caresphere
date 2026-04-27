@@ -22,7 +22,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         break;
       case "outline":
         classes +=
-          " border border-neutral text-neutral bg-transparent hover:bg-neutral hover:text-white rounded-sm";
+          " border border-white/20 text-white/60 bg-transparent hover:bg-white/5 hover:text-white rounded-sm";
         break;
       case "outline-light":
         classes +=
@@ -38,7 +38,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         break;
       case "ghost":
         classes +=
-          " hover:bg-gray-100 text-neutral rounded-sm";
+          " hover:bg-white/10 text-white/60 hover:text-white rounded-sm";
         break;
     }
 

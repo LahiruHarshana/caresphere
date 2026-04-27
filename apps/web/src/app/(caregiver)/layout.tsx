@@ -52,7 +52,7 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-neutral-50">
       <div className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col">
         <div className="p-6 border-b border-gray-100">
-          <Link href="/caregiver/dashboard" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
             <div>
               <h1 className="font-heading text-lg text-neutral">CareSphere</h1>
@@ -109,7 +109,7 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
 
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50">
         <div className="flex items-center justify-between px-4 h-14">
-          <Link href="/caregiver/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="CareSphere" className="h-8 w-auto" />
           </Link>
           <button onClick={logout} className="text-neutral-400">

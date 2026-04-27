@@ -18,11 +18,12 @@ import {
   Clock,
   Star,
   ArrowRight,
-  Sparkles,
   Award,
   Users2,
   Quote,
 } from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 const AnimatedCounter = ({ target, suffix = "" }: { target: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
@@ -102,81 +103,17 @@ export default function LandingPage() {
     offset: ["start start", "end start"],
   });
 
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
+const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  const statsRef = useRef(null);
-  const statsInView = useInView(statsRef, { once: true, margin: "-100px" });
+const statsRef = useRef(null);
+const statsInView = useInView(statsRef, { once: true, margin: "-100px" });
 
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  return (
+return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
-      {/* Navigation */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          isScrolled ? "bg-white/95 backdrop-blur-md border-b border-gray-100" : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-3"
-          >
-            <img src="/logo.png" alt="CareSphere" className="h-12 w-auto" />
-          </motion.div>
+      <Navbar isTransparent />
 
-          <nav className="hidden md:flex items-center gap-10">
-            {["Features", "How it Works", "About"].map((item, i) => (
-              <motion.div
-                key={item}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-              >
-                <Link
-                  href={`#${item.toLowerCase().replace(" ", "-")}`}
-                  className="text-sm font-body text-neutral-600 hover:text-primary transition-colors duration-300"
-                >
-                  {item}
-                </Link>
-              </motion.div>
-            ))}
-          </nav>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-6"
-          >
-            <Link
-              href="/login"
-              className="text-sm font-body text-neutral-600 hover:text-primary transition-colors duration-300 hidden sm:block"
-            >
-              Login
-            </Link>
-            <Link href="/register?role=CUSTOMER">
-              <Button variant="outline" size="default" className="btn-cta">
-                Get Started
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </motion.header>
-
-      <main className="flex-grow pt-20 relative z-10">
+      <main className="flex-grow relative z-10">
 {/* Hero Section */}
       <section
           ref={heroRef}
@@ -206,7 +143,6 @@ export default function LandingPage() {
                   transition={{ delay: 0.2 }}
                   className="section-label section-label-light mb-8"
                 >
-                  <Sparkles className="w-4 h-4" />
                   Trusted by 10,000+ Families
                 </motion.span>
 
@@ -464,7 +400,6 @@ export default function LandingPage() {
               className="text-center max-w-3xl mx-auto mb-20"
             >
               <span className="section-label">
-                <Sparkles className="w-4 h-4" />
                 Features
               </span>
               <h2 className="font-heading text-4xl lg:text-5xl text-neutral tracking-tight">
@@ -757,79 +692,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="footer-dark text-gray-300 py-20">
-        <div className="max-w-7xl mx-auto px-8 relative z-10">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <img src="/logo.png" alt="CareSphere" className="h-10 w-auto brightness-0 invert" />
-              </div>
-              <p className="max-w-sm text-gray-400 leading-relaxed font-body text-sm mb-6">
-                Connecting families with vetted, compassionate caregivers through technology and trust.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-heading text-lg mb-6">Platform</h4>
-              <ul className="space-y-3">
-                {["Find Care", "Become a Caregiver", "Trust & Safety", "Pricing", "FAQs"].map(
-                  (link) => (
-                    <li key={link}>
-                      <Link
-                        href="#"
-                        className="text-gray-400 hover:text-primary transition-colors duration-300 font-body text-sm"
-                      >
-                        {link}
-                      </Link>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-heading text-lg mb-6">Company</h4>
-              <ul className="space-y-3">
-                {["About Us", "Careers", "Blog", "Press", "Contact"].map((link) => (
-                  <li key={link}>
-                    <Link
-                      href="#"
-                      className="text-gray-400 hover:text-primary transition-colors duration-300 font-body text-sm"
-                    >
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-heading text-lg mb-6">Legal</h4>
-              <ul className="space-y-3">
-                {["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR"].map((link) => (
-                  <li key={link}>
-                    <Link
-                      href="#"
-                      className="text-gray-400 hover:text-primary transition-colors duration-300 font-body text-sm"
-                    >
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 font-body text-sm">© {new Date().getFullYear()} CareSphere Inc. All rights reserved.</p>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="w-2 h-2 rounded-full bg-green-400" />
-              <span className="text-gray-400 font-body">All systems operational</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
-import { Calendar, Clock, CheckCircle, XCircle, Sparkles } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle } from "lucide-react";
 
 export default function AvailabilityPage() {
   const { token } = useAuth();
@@ -88,7 +88,6 @@ export default function AvailabilityPage() {
           
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 px-8 py-4 border-t border-gray-100">
             <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-teal-600" />
               <p className="text-sm text-teal-700 font-medium">
                 {isAvailable ? "Your profile is visible to customers searching for caregivers" : "Update your availability to start receiving bookings"}
               </p>

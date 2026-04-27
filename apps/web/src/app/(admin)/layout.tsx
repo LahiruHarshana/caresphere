@@ -42,13 +42,13 @@ export default function AdminLayout({
     <div className="flex min-h-screen bg-neutral-50">
       <div className="w-64 bg-neutral-900 text-white flex flex-col">
         <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <img src="/logo.png" alt="CareSphere" className="h-8 w-auto brightness-0 invert" />
             <div>
               <h1 className="font-heading text-lg text-white">Admin Center</h1>
               <p className="text-xs text-white/50 font-body">CareSphere Platform</p>
             </div>
-          </div>
+          </Link>
         </div>
         <nav className="flex-1 p-4">
           <div className="space-y-1">

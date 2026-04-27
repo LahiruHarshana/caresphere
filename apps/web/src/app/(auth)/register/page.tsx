@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { HeartPulse, Check, ArrowRight, ArrowLeft, User, Shield, Clock, Briefcase } from "lucide-react";
 
 type UserRole = "CUSTOMER" | "CAREGIVER";
@@ -332,37 +333,37 @@ function RegisterContent() {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-center mb-8">
+    <div className="flex items-start justify-between mb-14 w-full relative max-w-lg mx-auto">
       {steps.map((step, index) => {
         const Icon = step.icon;
         const isActive = currentStep === step.id;
         const isCompleted = currentStep > step.id;
         return (
-          <div key={step.id} className="flex items-center">
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                  isCompleted
-                    ? "bg-primary text-white"
-                    : isActive
-                    ? "bg-primary text-white ring-4 ring-primary/20"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-              </div>
-              <span
-                className={`text-xs mt-2 font-medium ${
-                  isActive ? "text-primary" : isCompleted ? "text-gray-700" : "text-gray-400"
-                }`}
-              >
-                {step.title}
-              </span>
+          <div key={step.id} className="flex-1 flex flex-col items-center relative">
+            <div
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all relative z-10 ${
+                isCompleted
+                  ? "bg-[#0d9488] text-white"
+                  : isActive
+                  ? "bg-[#0d9488] text-white ring-4 ring-[#0d9488]/20"
+                  : "bg-white/5 text-white/30"
+              }`}
+            >
+              {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
             </div>
+            
+            <span
+              className={`text-xs mt-2 font-medium text-center px-1 whitespace-nowrap absolute top-10 ${
+                isActive ? "text-[#5eead4]" : isCompleted ? "text-white/70" : "text-white/30"
+              }`}
+            >
+              {step.title}
+            </span>
+
             {index < steps.length - 1 && (
               <div
-                className={`w-12 h-0.5 mx-2 mb-6 ${
-                  currentStep > step.id ? "bg-primary" : "bg-gray-200"
+                className={`absolute top-5 left-[50%] w-full h-0.5 ${
+                  currentStep > step.id ? "bg-[#0d9488]" : "bg-white/10"
                 }`}
               />
             )}
@@ -376,14 +377,14 @@ function RegisterContent() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Create Your Account</h2>
-              <p className="text-gray-500 mt-1">Join CareSphere to find the perfect caregiver</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Create Your Account</h2>
+              <p className="text-white/50 font-body">Join CareSphere to find the perfect caregiver</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="text-white/70 text-sm font-body mb-2 block">Email Address</Label>
                 <Input
                   id="email"
                   name="email"
@@ -391,11 +392,13 @@ function RegisterContent() {
                   value={customerData.email}
                   onChange={handleCustomerChange}
                   placeholder="you@example.com"
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
                   <Input
                     id="password"
                     name="password"
@@ -403,10 +406,12 @@ function RegisterContent() {
                     value={customerData.password}
                     onChange={handleCustomerChange}
                     placeholder="Min. 8 characters"
+                    dark
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm</Label>
+                  <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -414,6 +419,8 @@ function RegisterContent() {
                     value={customerData.confirmPassword}
                     onChange={handleCustomerChange}
                     placeholder="Confirm password"
+                    dark
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                   />
                 </div>
               </div>
@@ -422,33 +429,37 @@ function RegisterContent() {
         );
       case 2:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-              <p className="text-gray-500 mt-1">Tell us about yourself</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Personal Information</h2>
+              <p className="text-white/50 font-body">Tell us about yourself</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName" className="text-white/70 text-sm font-body mb-2 block">First Name</Label>
                 <Input
                   id="firstName"
                   name="firstName"
                   value={customerData.firstName}
                   onChange={handleCustomerChange}
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
               <div>
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName" className="text-white/70 text-sm font-body mb-2 block">Last Name</Label>
                 <Input
                   id="lastName"
                   name="lastName"
                   value={customerData.lastName}
                   onChange={handleCustomerChange}
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-white/70 text-sm font-body mb-2 block">Phone Number</Label>
               <Input
                 id="phone"
                 name="phone"
@@ -456,156 +467,163 @@ function RegisterContent() {
                 value={customerData.phone}
                 onChange={handleCustomerChange}
                 placeholder="(555) 123-4567"
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
             <div>
-              <Label htmlFor="dateOfBirth">Date of Birth</Label>
+              <Label htmlFor="dateOfBirth" className="text-white/70 text-sm font-body mb-2 block">Date of Birth</Label>
               <Input
                 id="dateOfBirth"
                 name="dateOfBirth"
                 type="date"
                 value={customerData.dateOfBirth}
                 onChange={handleCustomerChange}
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address" className="text-white/70 text-sm font-body mb-2 block">Address</Label>
               <Input
                 id="address"
                 name="address"
                 value={customerData.address}
                 onChange={handleCustomerChange}
                 placeholder="123 Main St, City, State ZIP"
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
           </div>
         );
       case 3:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Care Needs</h2>
-              <p className="text-gray-500 mt-1">Help us understand your care requirements</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Care Needs</h2>
+              <p className="text-white/50 font-body">Help us understand your care requirements</p>
             </div>
             <div>
-              <Label htmlFor="careType">Type of Care Needed</Label>
+              <Label htmlFor="careType" className="text-white/70 text-sm font-body mb-2 block">Type of Care Needed</Label>
               <select
                 id="careType"
                 name="careType"
                 value={customerData.careType}
                 onChange={handleCustomerChange}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                className="flex h-11 w-full border border-white/10 bg-white/5 px-3 py-3 text-sm text-white rounded-sm focus-visible:outline-none focus-visible:border-[#0d9488]"
               >
-                <option value="">Select care type</option>
+                <option value="" className="bg-[#0f172a] text-white/50">Select care type</option>
                 {CARE_TYPES.map((type) => (
-                  <option key={type} value={type}>
+                  <option key={type} value={type} className="bg-[#0f172a] text-white">
                     {type}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <Label htmlFor="careFrequency">Care Frequency</Label>
+              <Label htmlFor="careFrequency" className="text-white/70 text-sm font-body mb-2 block">Care Frequency</Label>
               <select
                 id="careFrequency"
                 name="careFrequency"
                 value={customerData.careFrequency}
                 onChange={handleCustomerChange}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                className="flex h-11 w-full border border-white/10 bg-white/5 px-3 py-3 text-sm text-white rounded-sm focus-visible:outline-none focus-visible:border-[#0d9488]"
               >
-                <option value="">Select frequency</option>
+                <option value="" className="bg-[#0f172a] text-white/50">Select frequency</option>
                 {CARE_FREQUENCIES.map((freq) => (
-                  <option key={freq} value={freq}>
+                  <option key={freq} value={freq} className="bg-[#0f172a] text-white">
                     {freq}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <Label htmlFor="preferredSchedule">Preferred Schedule</Label>
+              <Label htmlFor="preferredSchedule" className="text-white/70 text-sm font-body mb-2 block">Preferred Schedule</Label>
               <select
                 id="preferredSchedule"
                 name="preferredSchedule"
                 value={customerData.preferredSchedule}
                 onChange={handleCustomerChange}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                className="flex h-11 w-full border border-white/10 bg-white/5 px-3 py-3 text-sm text-white rounded-sm focus-visible:outline-none focus-visible:border-[#0d9488]"
               >
-                <option value="">Select preferred time</option>
+                <option value="" className="bg-[#0f172a] text-white/50">Select preferred time</option>
                 {SCHEDULES.map((schedule) => (
-                  <option key={schedule} value={schedule}>
+                  <option key={schedule} value={schedule} className="bg-[#0f172a] text-white">
                     {schedule}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <Label htmlFor="specialRequirements">Special Requirements or Notes</Label>
-              <Textarea
+              <Label htmlFor="specialRequirements" className="text-white/70 text-sm font-body mb-2 block">Special Requirements or Notes</Label>
+              <textarea
                 id="specialRequirements"
                 name="specialRequirements"
                 value={customerData.specialRequirements}
                 onChange={handleCustomerChange}
                 rows={3}
                 placeholder="Any specific needs, medical conditions, or preferences..."
+                className="flex w-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 rounded-sm focus-visible:outline-none focus-visible:border-[#0d9488] resize-none"
               />
             </div>
           </div>
         );
       case 4:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Review Your Information</h2>
-              <p className="text-gray-500 mt-1">Please confirm your details before submitting</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Review Your Information</h2>
+              <p className="text-white/50 font-body">Please confirm your details before submitting</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-5 space-y-4">
+            <div className="bg-white/5 rounded-sm p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">Name</span>
-                  <p className="font-medium">{customerData.firstName} {customerData.lastName}</p>
+                  <span className="text-white/40">Name</span>
+                  <p className="font-body text-white mt-1">{customerData.firstName} {customerData.lastName}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Email</span>
-                  <p className="font-medium">{customerData.email}</p>
+                  <span className="text-white/40">Email</span>
+                  <p className="font-body text-white mt-1">{customerData.email}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Phone</span>
-                  <p className="font-medium">{customerData.phone}</p>
+                  <span className="text-white/40">Phone</span>
+                  <p className="font-body text-white mt-1">{customerData.phone}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Address</span>
-                  <p className="font-medium">{customerData.address || "Not provided"}</p>
+                  <span className="text-white/40">Address</span>
+                  <p className="font-body text-white mt-1">{customerData.address || "Not provided"}</p>
                 </div>
               </div>
-              <div className="border-t pt-4">
-                <span className="text-gray-500 text-sm">Care Requirements</span>
+              <div className="border-t border-white/10 pt-4">
+                <span className="text-white/40 text-sm">Care Requirements</span>
                 <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
                   <div>
-                    <span className="text-gray-500">Care Type</span>
-                    <p className="font-medium">{customerData.careType}</p>
+                    <span className="text-white/40">Care Type</span>
+                    <p className="font-body text-white mt-1">{customerData.careType}</p>
                   </div>
                   <div>
-                    <span className="text-gray-500">Frequency</span>
-                    <p className="font-medium">{customerData.careFrequency}</p>
+                    <span className="text-white/40">Frequency</span>
+                    <p className="font-body text-white mt-1">{customerData.careFrequency}</p>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-gray-500">Schedule</span>
-                    <p className="font-medium">{customerData.preferredSchedule || "Flexible"}</p>
+                    <span className="text-white/40">Schedule</span>
+                    <p className="font-body text-white mt-1">{customerData.preferredSchedule || "Flexible"}</p>
                   </div>
                   {customerData.specialRequirements && (
                     <div className="col-span-2">
-                      <span className="text-gray-500">Additional Notes</span>
-                      <p className="font-medium">{customerData.specialRequirements}</p>
+                      <span className="text-white/40">Additional Notes</span>
+                      <p className="font-body text-white mt-1">{customerData.specialRequirements}</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-lg">
-              <Shield className="w-5 h-5 text-primary mt-0.5" />
+            <div className="flex items-start gap-3 p-5 bg-[#0d9488]/10 border border-[#0d9488]/20 rounded-sm">
+              <Shield className="w-5 h-5 text-[#5eead4] mt-0.5 shrink-0" />
               <div className="text-sm">
-                <p className="font-medium text-primary">Your data is secure</p>
-                <p className="text-primary-600">
+                <p className="font-body text-[#5eead4]">Your data is secure</p>
+                <p className="text-white/50 mt-1 font-body">
                   All personal information is encrypted and stored securely. We never share your data without your consent.
                 </p>
               </div>
@@ -621,14 +639,14 @@ function RegisterContent() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Create Your Account</h2>
-              <p className="text-gray-500 mt-1">Join CareSphere as a caregiver</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Create Your Account</h2>
+              <p className="text-white/50 font-body">Join CareSphere as a caregiver</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="text-white/70 text-sm font-body mb-2 block">Email Address</Label>
                 <Input
                   id="email"
                   name="email"
@@ -636,11 +654,13 @@ function RegisterContent() {
                   value={caregiverData.email}
                   onChange={handleCaregiverChange}
                   placeholder="you@example.com"
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
                   <Input
                     id="password"
                     name="password"
@@ -648,10 +668,12 @@ function RegisterContent() {
                     value={caregiverData.password}
                     onChange={handleCaregiverChange}
                     placeholder="Min. 8 characters"
+                    dark
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm</Label>
+                  <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -659,6 +681,8 @@ function RegisterContent() {
                     value={caregiverData.confirmPassword}
                     onChange={handleCaregiverChange}
                     placeholder="Confirm password"
+                    dark
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                   />
                 </div>
               </div>
@@ -667,33 +691,37 @@ function RegisterContent() {
         );
       case 2:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-              <p className="text-gray-500 mt-1">Tell us about yourself</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Personal Information</h2>
+              <p className="text-white/50 font-body">Tell us about yourself</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName" className="text-white/70 text-sm font-body mb-2 block">First Name</Label>
                 <Input
                   id="firstName"
                   name="firstName"
                   value={caregiverData.firstName}
                   onChange={handleCaregiverChange}
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
               <div>
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName" className="text-white/70 text-sm font-body mb-2 block">Last Name</Label>
                 <Input
                   id="lastName"
                   name="lastName"
                   value={caregiverData.lastName}
                   onChange={handleCaregiverChange}
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-white/70 text-sm font-body mb-2 block">Phone Number</Label>
               <Input
                 id="phone"
                 name="phone"
@@ -701,51 +729,58 @@ function RegisterContent() {
                 value={caregiverData.phone}
                 onChange={handleCaregiverChange}
                 placeholder="(555) 123-4567"
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
             <div>
-              <Label htmlFor="dateOfBirth">Date of Birth</Label>
+              <Label htmlFor="dateOfBirth" className="text-white/70 text-sm font-body mb-2 block">Date of Birth</Label>
               <Input
                 id="dateOfBirth"
                 name="dateOfBirth"
                 type="date"
                 value={caregiverData.dateOfBirth}
                 onChange={handleCaregiverChange}
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address" className="text-white/70 text-sm font-body mb-2 block">Address</Label>
               <Input
                 id="address"
                 name="address"
                 value={caregiverData.address}
                 onChange={handleCaregiverChange}
                 placeholder="123 Main St, City, State ZIP"
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
             <div>
-              <Label htmlFor="bio">Short Bio</Label>
-              <Textarea
+              <Label htmlFor="bio" className="text-white/70 text-sm font-body mb-2 block">Short Bio</Label>
+              <textarea
                 id="bio"
                 name="bio"
                 value={caregiverData.bio}
                 onChange={handleCaregiverChange}
                 rows={3}
-                placeholder="Tell families a bit about yourself, your experience, and what makes you a great caregiver..."
+                placeholder="Tell families a bit about yourself..."
+                className="flex w-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 rounded-sm focus-visible:outline-none focus-visible:border-[#0d9488] resize-none"
               />
             </div>
           </div>
         );
       case 3:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Professional Details</h2>
-              <p className="text-gray-500 mt-1">Share your caregiving expertise</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Professional Details</h2>
+              <p className="text-white/50 font-body">Share your caregiving expertise</p>
             </div>
             <div>
-              <Label>Specialties</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
+              <Label className="text-white/70 text-sm font-body mb-3 block">Specialties</Label>
+              <div className="grid grid-cols-2 gap-2">
                 {SPECIALTIES.map((specialty) => {
                   const isSelected = caregiverData.specialties
                     .split(",")
@@ -756,10 +791,10 @@ function RegisterContent() {
                       key={specialty}
                       type="button"
                       onClick={() => handleSpecialtyToggle(specialty)}
-                      className={`p-3 rounded-lg border text-sm font-medium transition-all text-left ${
+                      className={`p-3 rounded-sm border text-sm font-body text-left transition-all ${
                         isSelected
-                          ? "border-primary bg-primary-50 text-primary"
-                          : "border-gray-200 hover:border-primary/50"
+                          ? "border-[#0d9488] bg-[#0d9488]/10 text-[#5eead4]"
+                          : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
                       }`}
                     >
                       {specialty}
@@ -770,7 +805,7 @@ function RegisterContent() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="experienceYears">Years of Experience</Label>
+                <Label htmlFor="experienceYears" className="text-white/70 text-sm font-body mb-2 block">Years of Experience</Label>
                 <Input
                   id="experienceYears"
                   name="experienceYears"
@@ -779,10 +814,12 @@ function RegisterContent() {
                   value={caregiverData.experienceYears}
                   onChange={handleCaregiverChange}
                   placeholder="5"
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
               <div>
-                <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+                <Label htmlFor="hourlyRate" className="text-white/70 text-sm font-body mb-2 block">Hourly Rate ($)</Label>
                 <Input
                   id="hourlyRate"
                   name="hourlyRate"
@@ -792,73 +829,77 @@ function RegisterContent() {
                   value={caregiverData.hourlyRate}
                   onChange={handleCaregiverChange}
                   placeholder="25.00"
+                  dark
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="certifications">Certifications (comma separated)</Label>
+              <Label htmlFor="certifications" className="text-white/70 text-sm font-body mb-2 block">Certifications (comma separated)</Label>
               <Input
                 id="certifications"
                 name="certifications"
                 value={caregiverData.certifications}
                 onChange={handleCaregiverChange}
                 placeholder="CPR, First Aid, Nursing License"
+                dark
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
               />
             </div>
           </div>
         );
       case 4:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Background Verification</h2>
-              <p className="text-gray-500 mt-1">For the safety of families we serve</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Background Verification</h2>
+              <p className="text-white/50 font-body">For the safety of families we serve</p>
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-sm p-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                  <Shield className="w-6 h-6 text-amber-600" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                  <Shield className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-amber-900">Background Check Required</h3>
-                  <p className="text-amber-700 mt-1 text-sm">
-                    As a caregiver on CareSphere, you agree to undergo a comprehensive background check including identity verification, criminal history, and reference checks. This ensures the safety and trust of the families we serve.
+                  <h3 className="font-heading text-lg text-white mb-2">Background Check Required</h3>
+                  <p className="text-white/50 text-sm leading-relaxed">
+                    As a caregiver on CareSphere, you agree to undergo a comprehensive background check including identity verification, criminal history, and reference checks.
                   </p>
                 </div>
               </div>
             </div>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">Background Check Includes:</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
+              <div className="p-5 bg-white/5 rounded-sm">
+                <h4 className="font-body text-white/70 text-sm mb-3">Background Check Includes:</h4>
+                <ul className="space-y-2 text-sm text-white/50">
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary" />
+                    <Check className="w-4 h-4 text-[#0d9488]" />
                     Identity verification
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary" />
+                    <Check className="w-4 h-4 text-[#0d9488]" />
                     National criminal record check
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary" />
+                    <Check className="w-4 h-4 text-[#0d9488]" />
                     Sex offender registry check
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-primary" />
+                    <Check className="w-4 h-4 text-[#0d9488]" />
                     Reference verification
                   </li>
                 </ul>
               </div>
-              <div className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-start gap-3 p-4 border border-white/10 rounded-sm">
                 <input
                   type="checkbox"
                   id="agreeToBackgroundCheck"
                   checked={caregiverData.agreeToBackgroundCheck}
                   onChange={(e) => handleCheckboxChange("agreeToBackgroundCheck", e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent text-[#0d9488] focus:ring-[#0d9488]"
                 />
-                <Label htmlFor="agreeToBackgroundCheck" className="text-sm font-normal cursor-pointer">
-                  I consent to a comprehensive background check and certify that all information provided is accurate and complete. I understand that providing false information may result in removal from the platform.
+                <Label htmlFor="agreeToBackgroundCheck" className="text-sm font-body text-white/60 cursor-pointer">
+                  I consent to a comprehensive background check and certify that all information provided is accurate and complete.
                 </Label>
               </div>
             </div>
@@ -866,53 +907,53 @@ function RegisterContent() {
         );
       case 5:
         return (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Review Your Profile</h2>
-              <p className="text-gray-500 mt-1">Confirm your information before going live</p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Review Your Profile</h2>
+              <p className="text-white/50 font-body">Confirm your information before going live</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-5 space-y-4">
-              <div className="flex items-center gap-4 pb-4 border-b">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center text-white text-2xl font-bold">
+            <div className="bg-white/5 rounded-sm p-6 space-y-4">
+              <div className="flex items-center gap-4 pb-4 border-b border-white/10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0d9488] to-[#0f766e] flex items-center justify-center text-white text-2xl font-bold">
                   {caregiverData.firstName?.charAt(0) || "?"}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">{caregiverData.firstName} {caregiverData.lastName}</h3>
-                  <p className="text-gray-500">{caregiverData.email}</p>
+                  <h3 className="font-heading text-xl text-white">{caregiverData.firstName} {caregiverData.lastName}</h3>
+                  <p className="text-white/40 text-sm">{caregiverData.email}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">Phone</span>
-                  <p className="font-medium">{caregiverData.phone}</p>
+                  <span className="text-white/40">Phone</span>
+                  <p className="font-body text-white mt-1">{caregiverData.phone}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Address</span>
-                  <p className="font-medium">{caregiverData.address || "Not provided"}</p>
+                  <span className="text-white/40">Address</span>
+                  <p className="font-body text-white mt-1">{caregiverData.address || "Not provided"}</p>
                 </div>
               </div>
               {caregiverData.bio && (
                 <div className="text-sm">
-                  <span className="text-gray-500">Bio</span>
-                  <p className="font-medium">{caregiverData.bio}</p>
+                  <span className="text-white/40">Bio</span>
+                  <p className="font-body text-white mt-1">{caregiverData.bio}</p>
                 </div>
               )}
-              <div className="border-t pt-4">
-                <span className="text-gray-500 text-sm">Professional Info</span>
+              <div className="border-t border-white/10 pt-4">
+                <span className="text-white/40 text-sm">Professional Info</span>
                 <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
                   <div>
-                    <span className="text-gray-500">Experience</span>
-                    <p className="font-medium">{caregiverData.experienceYears} years</p>
+                    <span className="text-white/40">Experience</span>
+                    <p className="font-body text-white mt-1">{caregiverData.experienceYears} years</p>
                   </div>
                   <div>
-                    <span className="text-gray-500">Hourly Rate</span>
-                    <p className="font-medium">${caregiverData.hourlyRate}/hr</p>
+                    <span className="text-white/40">Hourly Rate</span>
+                    <p className="font-body text-white mt-1">${caregiverData.hourlyRate}/hr</p>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-gray-500">Specialties</span>
+                    <span className="text-white/40">Specialties</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {caregiverData.specialties.split(",").map((s) => s.trim()).filter(Boolean).map((spec) => (
-                        <span key={spec} className="px-2 py-0.5 bg-primary-100 text-primary text-xs rounded-full">
+                        <span key={spec} className="px-2 py-0.5 bg-[#0d9488]/20 text-[#5eead4] text-xs rounded-full">
                           {spec}
                         </span>
                       ))}
@@ -920,18 +961,18 @@ function RegisterContent() {
                   </div>
                   {caregiverData.certifications && (
                     <div className="col-span-2">
-                      <span className="text-gray-500">Certifications</span>
-                      <p className="font-medium">{caregiverData.certifications}</p>
+                      <span className="text-white/40">Certifications</span>
+                      <p className="font-body text-white mt-1">{caregiverData.certifications}</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg">
-              <Clock className="w-5 h-5 text-amber-600 mt-0.5" />
+            <div className="flex items-start gap-3 p-5 bg-amber-500/10 border border-amber-500/20 rounded-sm">
+              <Clock className="w-5 h-5 text-amber-400 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-amber-900">Review Pending</p>
-                <p className="text-amber-700">
+                <p className="font-body text-white">Review Pending</p>
+                <p className="text-white/50 mt-1">
                   Your profile will be reviewed by our team within 24-48 hours. You will receive an email once approved.
                 </p>
               </div>
@@ -944,83 +985,65 @@ function RegisterContent() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
-      <div className="mb-6">
-        <a href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </a>
-      </div>
-      {renderStepIndicator()}
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-md">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
+    <div className="min-h-screen bg-[#0f172a] overflow-y-auto">
+      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inner-card p-8 md:p-10 w-full max-w-2xl"
+        >
+          <div className="mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm font-body text-white/40 hover:text-white transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
           </div>
-        </div>
-      )}
+          {renderStepIndicator()}
 
-      {stepErrors[currentStep] && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-md">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-sm p-4 mb-6">
+              <p className="text-sm text-red-400 font-body">{error}</p>
             </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{stepErrors[currentStep]}</p>
+          )}
+
+          {stepErrors[currentStep] && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-sm p-4 mb-6">
+              <p className="text-sm text-red-400 font-body">{stepErrors[currentStep]}</p>
             </div>
+          )}
+
+          <div className="min-h-[320px]">
+            {role === "CUSTOMER" ? renderCustomerStep() : renderCaregiverStep()}
           </div>
-        </div>
-      )}
 
-      <div className="min-h-[320px]">
-        {role === "CUSTOMER" ? renderCustomerStep() : renderCaregiverStep()}
-      </div>
+          <div className="flex justify-between mt-8 pt-6 border-t border-white/5">
+            {currentStep > 1 ? (
+              <Button type="button" variant="outline" onClick={prevStep} className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            ) : (
+              <div />
+            )}
+            {currentStep < steps.length ? (
+              <Button type="button" onClick={nextStep} className="bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488]">
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleSubmit} disabled={isLoading} className="bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488]">
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+            )}
+          </div>
 
-      <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-        {currentStep > 1 ? (
-          <Button type="button" variant="outline" onClick={prevStep}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        ) : (
-          <div />
-        )}
-        {currentStep < steps.length ? (
-          <Button type="button" onClick={nextStep}>
-            Continue
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        ) : (
-          <Button type="button" onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? "Creating Account..." : "Create Account"}
-          </Button>
-        )}
-      </div>
-
-      <div className="mt-6 text-center text-sm text-gray-500">
-        Already have an account?{" "}
-        <a href="/login" className="text-primary font-medium hover:underline">
-          Sign in
-        </a>
+          <div className="mt-6 text-center text-sm text-white/40 font-body">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#5eead4] font-medium hover:underline">
+              Sign in
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -1028,12 +1051,12 @@ function RegisterContent() {
 
 function RegisterFallback() {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 animate-pulse">
-      <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-6" />
+    <div className="bg-[#0f172a] rounded-2xl shadow-xl p-8 animate-pulse border border-white/10">
+      <div className="h-8 bg-white/10 rounded w-1/2 mx-auto mb-6" />
       <div className="space-y-4">
-        <div className="h-10 bg-gray-200 rounded" />
-        <div className="h-10 bg-gray-200 rounded" />
-        <div className="h-10 bg-gray-200 rounded" />
+        <div className="h-10 bg-white/10 rounded" />
+        <div className="h-10 bg-white/10 rounded" />
+        <div className="h-10 bg-white/10 rounded" />
       </div>
     </div>
   );

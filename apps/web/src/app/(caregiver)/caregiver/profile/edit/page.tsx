@@ -159,13 +159,14 @@ export default function CaregiverProfileEdit() {
               type="file"
               accept="image/*"
               onChange={handleCoverUpload}
-              className="hidden"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
             
             <button
+              type="button"
               onClick={() => coverInputRef.current?.click()}
               disabled={uploadingCover}
-              className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
             >
               {uploadingCover ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
