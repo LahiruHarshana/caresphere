@@ -30,8 +30,8 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-neutral-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <div className="caregiver-shell flex h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-700"></div>
       </div>
     );
   }
@@ -49,20 +49,20 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
-      <div className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col">
-        <div className="p-6 border-b border-gray-100">
+    <div className="caregiver-shell flex min-h-screen">
+      <aside className="caregiver-sidebar hidden w-72 flex-col md:flex">
+        <div className="border-b border-slate-100 p-6">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="CareSphere" className="h-10 w-auto" />
+            <img src="/logo.png" alt="CareSphere" className="h-11 w-auto" />
             <div>
-              <h1 className="font-heading text-lg text-neutral">CareSphere</h1>
-              <p className="text-xs font-body text-neutral-400">Caregiver Portal</p>
+              <h1 className="font-heading text-xl text-slate-950">CareSphere</h1>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-teal-700">Caregiver Portal</p>
             </div>
           </Link>
         </div>
 
         <nav className="flex-1 p-4">
-          <div className="space-y-1">
+          <div className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -70,13 +70,9 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-body transition-all duration-300 ${
-                    isActive
-                      ? "bg-primary/10 text-primary border-l-2 border-primary"
-                      : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
-                  }`}
+                  className={`caregiver-nav-item ${isActive ? "active" : ""}`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-neutral-300"}`} />
+                  <Icon className="h-5 w-5" />
                   {item.label}
                 </Link>
               );
@@ -84,41 +80,63 @@ export default function CaregiverLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-sm bg-primary/10 flex items-center justify-center text-primary font-heading text-sm">
+        <div className="border-t border-slate-100 p-4">
+          <div className="caregiver-panel-soft mb-4 flex items-center gap-3 p-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-700 font-heading text-sm text-white">
               {user.firstName[0]}{user.lastName[0]}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-body text-neutral truncate">
+              <p className="truncate text-sm font-semibold text-slate-900">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs font-body text-neutral-400 truncate">{user.email}</p>
+              <p className="truncate text-xs text-slate-500">{user.email}</p>
             </div>
             <NotificationBell />
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-2.5 rounded-sm text-sm font-body text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors duration-300"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-500 transition-colors duration-200 hover:bg-red-50 hover:text-red-600"
           >
             <LogOut className="w-4 h-4" />
             Logout
           </button>
         </div>
-      </div>
+      </aside>
 
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50">
-        <div className="flex items-center justify-between px-4 h-14">
+      <div className="fixed left-0 right-0 top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur md:hidden">
+        <div className="flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="CareSphere" className="h-8 w-auto" />
+            <span className="font-heading text-lg text-slate-950">CareSphere</span>
           </Link>
-          <button onClick={logout} className="text-neutral-400">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <button onClick={logout} className="text-slate-500" aria-label="Logout">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <div className="flex gap-2 overflow-x-auto px-4 pb-3">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold ${
+                  isActive ? "bg-teal-700 text-white" : "bg-slate-100 text-slate-600"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
-      <main className="flex-1 overflow-auto md:p-8 p-4 pt-20 md:pt-8">
+      <main className="flex-1 overflow-auto px-4 pb-8 pt-32 md:px-8 md:py-8">
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BookingsService } from './bookings.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('BookingsService', () => {
   let service: BookingsService;
@@ -15,12 +16,16 @@ describe('BookingsService', () => {
       findUnique: jest.fn(),
     },
   };
+  const mockNotificationsService = {
+    sendNotification: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BookingsService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 
@@ -34,6 +39,10 @@ describe('BookingsService', () => {
 
   describe('createBooking', () => {
     it('should reject booking with overlapping schedule', async () => {
+      mockPrisma.caregiverProfile.findUnique.mockResolvedValue({
+        hourlyRate: 25,
+        isAvailable: true,
+      });
       // Mock existing booking in the same time range
       mockPrisma.booking.findFirst.mockResolvedValue({ id: 'existing' });
 
@@ -44,13 +53,14 @@ describe('BookingsService', () => {
           scheduledAt: new Date('2024-03-01T09:00:00'),
           endAt: new Date('2024-03-01T11:00:00'),
         }),
-      ).rejects.toThrow('Caregiver is not available');
+      ).rejects.toThrow('Caregiver is already booked for this time slot');
     });
 
     it('should create booking and calculate cost', async () => {
       mockPrisma.booking.findFirst.mockResolvedValue(null); // No overlap
       mockPrisma.caregiverProfile.findUnique.mockResolvedValue({
         hourlyRate: 25,
+        isAvailable: true,
       });
       mockPrisma.booking.create.mockResolvedValue({
         id: 'booking-1',

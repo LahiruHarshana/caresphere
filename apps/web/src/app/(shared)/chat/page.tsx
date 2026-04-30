@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { ChatWindow } from '@/components/chat/chat-window';
-import { MessageCircle, ChevronLeft, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { MessageCircle, ChevronLeft } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -59,21 +58,25 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 h-[calc(100vh-100px)]">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Your Conversations</h1>
+    <div className="caregiver-page flex h-[calc(100vh-120px)] min-h-[720px] flex-col gap-6">
+      <section className="caregiver-hero">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-teal-50">
+              <MessageCircle className="h-3.5 w-3.5" />
+              Care conversations
+            </div>
+            <h1 className="font-heading text-3xl text-white md:text-4xl">Your Conversations</h1>
+            <p className="mt-2 max-w-2xl text-sm text-white/75 md:text-base">Keep booking details and care updates in one calm, organized workspace.</p>
+          </div>
+          <span className="rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
+            {conversations.length} {conversations.length === 1 ? 'conversation' : 'conversations'}
+          </span>
         </div>
-        <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-          {conversations.length} conversations
-        </span>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100%-80px)]">
-        <div className={`md:col-span-1 border rounded-2xl bg-white overflow-y-auto shadow-sm ${selectedUser && !showList ? 'hidden md:block' : ''}`}>
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 md:grid-cols-3">
+        <div className={`caregiver-panel overflow-y-auto ${selectedUser && !showList ? 'hidden md:block' : ''}`}>
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700 mx-auto"></div>
@@ -92,7 +95,7 @@ export default function ChatPage() {
                   setSelectedUser(conv.otherUser);
                   setShowList(false);
                 }}
-                className={`w-full text-left p-4 border-b hover:bg-gray-50 transition-colors ${
+                className={`w-full border-b border-slate-100 p-4 text-left transition-colors hover:bg-teal-50/50 ${
                   selectedUser?.id === conv.otherUser.id ? 'bg-teal-50' : ''
                 }`}
               >
@@ -104,7 +107,7 @@ export default function ChatPage() {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center text-teal-700 font-bold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-teal-100 to-teal-200 font-bold text-teal-700">
                       {conv.otherUser.profile.firstName[0]}
                     </div>
                   )}
@@ -120,7 +123,7 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className={`md:col-span-2 h-full flex flex-col ${!selectedUser || showList ? 'hidden md:flex' : ''}`}>
+        <div className={`flex h-full flex-col md:col-span-2 ${!selectedUser || showList ? 'hidden md:flex' : ''}`}>
           {selectedUser ? (
             <>
               <div className="md:hidden mb-4">
@@ -143,7 +146,7 @@ export default function ChatPage() {
               />
             </>
           ) : (
-            <div className="h-full flex items-center justify-center border rounded-2xl bg-gradient-to-br from-gray-50 to-teal-50/30 shadow-sm">
+            <div className="caregiver-panel flex h-full items-center justify-center bg-gradient-to-br from-white to-teal-50/40">
               <div className="text-center">
                 <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500 font-medium">Select a conversation to start chatting</p>

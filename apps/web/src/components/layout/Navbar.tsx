@@ -6,7 +6,6 @@ import { useAuth } from "@/lib/auth-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Menu, X } from "lucide-react";
-import { usePathname } from "next/navigation";
 
 interface NavbarProps {
   isTransparent?: boolean;
@@ -16,7 +15,6 @@ export const Navbar = ({ isTransparent = false }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,7 +101,7 @@ export const Navbar = ({ isTransparent = false }: NavbarProps) => {
                 Login
               </Link>
               <Link href="/register?role=CUSTOMER">
-                <Button variant={isTransparent && !isScrolled ? "outline-light" : "outline"} size="default" className="btn-cta">
+                <Button variant="filled" size="default" className="btn-cta">
                   Get Started
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -170,7 +168,9 @@ export const Navbar = ({ isTransparent = false }: NavbarProps) => {
                     href="/register?role=CUSTOMER"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button className="w-full justify-center">Get Started</Button>
+                    <Button variant="filled" className="w-full justify-center">
+                      Get Started
+                    </Button>
                   </Link>
                 </>
               )}

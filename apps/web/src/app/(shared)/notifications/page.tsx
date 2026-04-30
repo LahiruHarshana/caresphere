@@ -83,40 +83,42 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Bell className="w-8 h-8 text-teal-600" />
-            Notifications
-          </h1>
-          <p className="text-gray-600 mt-2">Stay updated with your latest activities</p>
+    <div className="caregiver-page space-y-8">
+      <section className="caregiver-hero">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-teal-50">
+              <Bell className="h-3.5 w-3.5" />
+              Alerts
+            </div>
+            <h1 className="font-heading text-3xl text-white md:text-4xl">Notifications</h1>
+            <p className="mt-2 max-w-2xl text-sm text-white/75 md:text-base">Stay updated with bookings, account changes, and care activity.</p>
+          </div>
+          {notifications.some(n => !n.isRead) && (
+            <button
+              onClick={markAllAsRead}
+              className="caregiver-primary-button bg-white text-teal-800 hover:bg-teal-50"
+            >
+              Mark all as read
+            </button>
+          )}
         </div>
-        
-        {notifications.some(n => !n.isRead) && (
-          <button
-            onClick={markAllAsRead}
-            className="text-sm font-medium text-teal-600 hover:text-teal-700 bg-teal-50 px-4 py-2 rounded-lg transition-colors"
-          >
-            Mark all as read
-          </button>
-        )}
-      </div>
+      </section>
 
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+            <div key={i} className="h-24 animate-pulse rounded-lg bg-white/70" />
           ))}
         </div>
       ) : notifications.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+        <div className="caregiver-panel border-dashed py-20 text-center">
           <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">No notifications</h3>
+          <h3 className="font-heading text-xl text-slate-950">No notifications</h3>
           <p className="text-gray-500 mt-1">We&apos;ll notify you when something important happens.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="caregiver-panel overflow-hidden">
           {notifications.map((n) => (
             <div
               key={n.id}

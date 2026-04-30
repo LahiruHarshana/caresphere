@@ -85,6 +85,7 @@ export default function BrowseCaregiversPage() {
         {caregivers.map((cg, index) => (
           <div
             key={cg.id}
+            data-testid="caregiver-card"
             className="group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
           >
             <div className="relative h-40">

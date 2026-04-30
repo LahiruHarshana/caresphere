@@ -60,6 +60,15 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
+.dark-input:-webkit-autofill,
+.dark-input:-webkit-autofill:hover,
+.dark-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px rgba(15, 23, 42, 0.92) inset;
+  transition: background-color 9999s ease-out;
+}
+
 /* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
@@ -1049,6 +1058,180 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.06);
   color: white;
   padding-left: 1.25rem;
+}
+
+/* ─── Caregiver Portal Polish ─────────────────────────────────────────────── */
+.caregiver-shell {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(20, 184, 166, 0.12), transparent 34%),
+    linear-gradient(180deg, #f6faf9 0%, #f8fafc 42%, #eef6f5 100%);
+}
+
+.caregiver-sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 12px 0 40px rgba(15, 23, 42, 0.04);
+}
+
+.caregiver-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 8px;
+  padding: 0.8rem 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 180ms ease;
+}
+
+.caregiver-nav-item:hover {
+  background: #f1fdfa;
+  color: #0f766e;
+}
+
+.caregiver-nav-item.active {
+  background: #0f766e;
+  color: white;
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.22);
+}
+
+.caregiver-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.caregiver-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.94), rgba(15, 23, 42, 0.96)),
+    url("/media/images/caregiver-profile-cover.jpg") center/cover;
+  color: white;
+  padding: clamp(1.35rem, 4vw, 2.35rem);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+}
+
+.caregiver-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08));
+  pointer-events: none;
+}
+
+.caregiver-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.caregiver-panel {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+}
+
+.caregiver-panel-dark {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.18);
+}
+
+.caregiver-panel-soft {
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  border-radius: 8px;
+}
+
+.caregiver-stat-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.caregiver-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+}
+
+.caregiver-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.caregiver-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  background: #0f766e;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  transition: all 180ms ease;
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.2);
+}
+
+.caregiver-primary-button:hover {
+  background: #115e59;
+  transform: translateY(-1px);
+}
+
+.caregiver-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: white;
+  color: #334155;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  transition: all 180ms ease;
+}
+
+.caregiver-secondary-button:hover {
+  border-color: rgba(15, 118, 110, 0.35);
+  color: #0f766e;
+}
+
+.caregiver-field {
+  width: 100%;
+  border: 1px solid #dbe5e4;
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.84);
+  padding: 0.8rem 0.95rem;
+  color: #0f172a;
+  transition: all 180ms ease;
+}
+
+.caregiver-field:focus {
+  outline: none;
+  border-color: #0f766e;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+}
+
+.caregiver-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 /* ─── Mix-blend for Nav ─────────────────────────────────────────────────────── */

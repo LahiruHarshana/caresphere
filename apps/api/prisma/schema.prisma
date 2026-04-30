@@ -41,6 +41,8 @@ model User {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String
+  firebaseUid  String?  @unique
+  authProvider String   @default("EMAIL")
   role         Role
   isVerified   Boolean  @default(false)
   isBanned     Boolean  @default(false)

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
-import { X, Calendar, Clock, AlertCircle } from "lucide-react";
+import { Calendar, Clock, AlertCircle, CheckCircle, ClipboardList } from "lucide-react";
 
 interface Booking {
   id: string;
@@ -119,20 +119,43 @@ export default function GigsPage() {
     .slice(0, 5);
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900">My Gigs</h1>
+    <div className="caregiver-page space-y-8">
+      <section className="caregiver-hero">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-teal-50">
+              <ClipboardList className="h-3.5 w-3.5" />
+              Booking workflow
+            </div>
+            <h1 className="font-heading text-3xl text-white md:text-4xl">My Gigs</h1>
+            <p className="mt-2 max-w-2xl text-sm text-white/75 md:text-base">Review requests, start confirmed visits, and close completed care sessions from one place.</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg bg-white/10 px-4 py-3">
+              <p className="font-heading text-2xl text-white">{pendingBookings.length}</p>
+              <p className="text-xs text-white/60">Pending</p>
+            </div>
+            <div className="rounded-lg bg-white/10 px-4 py-3">
+              <p className="font-heading text-2xl text-white">{confirmedBookings.length}</p>
+              <p className="text-xs text-white/60">Upcoming</p>
+            </div>
+            <div className="rounded-lg bg-white/10 px-4 py-3">
+              <p className="font-heading text-2xl text-white">{inProgressBookings.length}</p>
+              <p className="text-xs text-white/60">Active</p>
+            </div>
+          </div>
+        </div>
+      </section>
       
       {modal.show && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+          <div className="caregiver-panel w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${modal.type === 'error' ? 'bg-red-100' : 'bg-green-100'}`}>
+              <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg ${modal.type === 'error' ? 'bg-red-100' : 'bg-green-100'}`}>
                 {modal.type === 'error' ? (
                   <AlertCircle className="w-6 h-6 text-red-600" />
                 ) : (
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 )}
               </div>
               <div className="flex-1">
@@ -145,7 +168,7 @@ export default function GigsPage() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setModal({ ...modal, show: false })}
-                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors"
+                className="caregiver-primary-button"
               >
                 Got it
               </button>
@@ -154,20 +177,20 @@ export default function GigsPage() {
         </div>
       )}
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {inProgressBookings.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+          <section className="caregiver-panel p-5 md:p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-heading text-xl text-slate-950">
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
               In Progress
             </h2>
             <div className="space-y-3">
               {inProgressBookings.map(b => {
                 const canComplete = canCompleteNow(b);
                 return (
-                  <div key={b.id} className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                  <div key={b.id} className="caregiver-panel-soft flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-100">
                         <Clock className="w-5 h-5 text-yellow-600" />
                       </div>
                       <div>
@@ -180,9 +203,9 @@ export default function GigsPage() {
                     </div>
                     <button 
                       onClick={() => handleMarkComplete(b)}
-                      className={`px-5 py-2.5 rounded-lg font-medium transition-all ${
+                      className={`rounded-lg px-5 py-2.5 font-semibold transition-all ${
                         canComplete 
-                          ? 'bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-200' 
+                          ? 'bg-green-600 text-white shadow-lg shadow-green-200 hover:bg-green-700' 
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                     >
@@ -196,18 +219,18 @@ export default function GigsPage() {
         )}
 
         {confirmedBookings.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+          <section className="caregiver-panel p-5 md:p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-heading text-xl text-slate-950">
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-500"></span>
               Confirmed (Upcoming)
             </h2>
             <div className="space-y-3">
               {confirmedBookings.map(b => {
                 const canStart = canStartNow(b);
                 return (
-                  <div key={b.id} className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                  <div key={b.id} className="caregiver-panel-soft flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
                         <Calendar className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
@@ -220,9 +243,9 @@ export default function GigsPage() {
                     </div>
                     <button 
                       onClick={() => handleStartGig(b)}
-                      className={`px-5 py-2.5 rounded-lg font-medium transition-all ${
+                      className={`rounded-lg px-5 py-2.5 font-semibold transition-all ${
                         canStart 
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200' 
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 hover:bg-blue-700' 
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                     >
@@ -236,16 +259,16 @@ export default function GigsPage() {
         )}
 
         {pendingBookings.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+          <section className="caregiver-panel p-5 md:p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-heading text-xl text-slate-950">
+              <span className="h-2.5 w-2.5 rounded-full bg-orange-500"></span>
               Pending Requests
             </h2>
             <div className="space-y-3">
               {pendingBookings.map(b => (
-                <div key={b.id} className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                <div key={b.id} className="caregiver-panel-soft flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-100">
                       <Clock className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
@@ -257,8 +280,8 @@ export default function GigsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => handleUpdateStatus(b.id, "CONFIRMED")} className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-md shadow-green-200">Accept</button>
-                    <button onClick={() => handleUpdateStatus(b.id, "CANCELLED")} className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors">Reject</button>
+                    <button onClick={() => handleUpdateStatus(b.id, "CONFIRMED")} className="rounded-lg bg-green-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-green-200 transition-colors hover:bg-green-700">Accept</button>
+                    <button onClick={() => handleUpdateStatus(b.id, "CANCELLED")} className="caregiver-secondary-button px-5 py-2.5">Reject</button>
                   </div>
                 </div>
               ))}
@@ -266,29 +289,27 @@ export default function GigsPage() {
           </section>
         )}
 
-        <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+        <section className="caregiver-panel p-5 md:p-6">
+          <h2 className="mb-4 flex items-center gap-2 font-heading text-xl text-slate-950">
+            <span className="h-2.5 w-2.5 rounded-full bg-green-500"></span>
             Recent Completed
           </h2>
           {completedBookings.length === 0 ? (
-            <p className="text-gray-500 py-4">No completed gigs yet</p>
+            <p className="py-4 text-slate-500">No completed gigs yet</p>
           ) : (
             <div className="space-y-3">
               {completedBookings.map(b => (
-                <div key={b.id} className="bg-gray-50 border border-gray-200 rounded-xl p-5 flex justify-between items-center">
+                <div key={b.id} className="caregiver-panel-soft flex items-center justify-between p-5">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-700">{b.customer.profile?.firstName} {b.customer.profile?.lastName}</h3>
                       <p className="text-gray-500 text-sm">{new Date(b.scheduledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">Completed</span>
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">Completed</span>
                 </div>
               ))}
             </div>
@@ -296,8 +317,8 @@ export default function GigsPage() {
         </section>
 
         {bookings.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="caregiver-panel py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-teal-50">
               <Calendar className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-1">No gigs yet</h3>

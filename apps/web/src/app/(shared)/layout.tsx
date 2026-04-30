@@ -73,13 +73,30 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
     ];
   }
 
+  const shellClass = isCaregiver ? "caregiver-shell min-h-screen" : "min-h-screen bg-[#0f172a]";
+  const headerClass = isCaregiver
+    ? "sticky top-0 z-50 border-b border-slate-100 bg-white/92 backdrop-blur"
+    : "app-nav sticky top-0 z-50";
+  const navLinkClass = (active: boolean) =>
+    isCaregiver
+      ? `inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition ${
+          active ? "bg-teal-700 text-white" : "text-slate-600 hover:bg-teal-50 hover:text-teal-800"
+        }`
+      : `app-nav-link ${active ? "active" : ""}`;
+
   return (
-    <div className="min-h-screen bg-[#0f172a]">
-      <header className="app-nav sticky top-0 z-50">
+    <div className={shellClass}>
+      <header className={headerClass}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Link href="/" className="flex items-center gap-3 shrink-0">
               <img src="/logo.png" alt="CareSphere" className="app-nav-logo" />
+              {isCaregiver && (
+                <div className="hidden sm:block">
+                  <p className="font-heading text-lg leading-none text-slate-950">CareSphere</p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-teal-700">Caregiver Portal</p>
+                </div>
+              )}
             </Link>
 
             <nav className="hidden lg:flex items-center gap-1">
@@ -90,7 +107,7 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`app-nav-link ${isActive ? "active" : ""}`}
+                    className={navLinkClass(isActive)}
                   >
                     <Icon className="w-4 h-4" />
                     {item.label}
@@ -100,12 +117,14 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
             </nav>
 
             <div className="flex items-center gap-4">
-              <span className="app-nav-user hidden sm:block">
+              <span className={`hidden sm:block text-sm ${isCaregiver ? "text-slate-500" : "app-nav-user"}`}>
                 Hi, {user.firstName}
               </span>
               <button
                 onClick={logout}
-                className="flex items-center gap-2 text-sm text-white/40 hover:text-red-400 transition-colors duration-300"
+                className={`flex items-center gap-2 text-sm transition-colors duration-300 ${
+                  isCaregiver ? "text-slate-500 hover:text-red-600" : "text-white/40 hover:text-red-400"
+                }`}
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Logout</span>
@@ -114,7 +133,7 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
 
-        <nav className="lg:hidden border-t border-white/5 overflow-x-auto">
+        <nav className={`lg:hidden overflow-x-auto ${isCaregiver ? "border-t border-slate-100" : "border-t border-white/5"}`}>
           <div className="flex px-4 py-2 gap-1">
             {navItems.slice(0, 6).map((item) => {
               const Icon = item.icon;
@@ -124,7 +143,9 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
                   key={item.href}
                   href={item.href}
                   className={`flex flex-col items-center gap-1 px-3 py-2 rounded-sm text-xs font-body whitespace-nowrap transition-all duration-300 ${
-                    isActive ? "bg-white/10 text-white" : "text-white/50"
+                    isCaregiver
+                      ? isActive ? "bg-teal-700 text-white" : "bg-slate-100 text-slate-600"
+                      : isActive ? "bg-white/10 text-white" : "text-white/50"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -142,7 +163,7 @@ export default function SharedLayout({ children }: { children: React.ReactNode }
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="max-w-7xl mx-auto px-6 lg:px-8 py-8"
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
         >
           <ErrorBoundary>
             {children}

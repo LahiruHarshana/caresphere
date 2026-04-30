@@ -1,11 +1,24 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
+import { getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+
+if (!getApps().length) {
+  initializeApp({
+    projectId: process.env.FIREBASE_PROJECT_ID || 'caresphere-9b92c',
+  });
+}
 
 @Injectable()
 export class AuthService {
@@ -100,7 +113,7 @@ export class AuthService {
     });
 
     // Send verification email
-    await this.sendVerificationEmail(email, verificationToken);
+    this.sendVerificationEmail(email, verificationToken);
 
     const tokens = await this.getTokens(user.id, user.email, user.role);
     return {
@@ -112,11 +125,12 @@ export class AuthService {
         lastName,
       },
       ...tokens,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message:
+        'Registration successful. Please check your email to verify your account.',
     };
   }
 
-  private async sendVerificationEmail(email: string, token: string) {
+  private sendVerificationEmail(email: string, token: string) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const verifyUrl = `${frontendUrl}/verify-email?token=${token}`;
 
@@ -158,7 +172,9 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       // Don't reveal if user exists
-      return { message: 'If the email exists, a verification link has been sent.' };
+      return {
+        message: 'If the email exists, a verification link has been sent.',
+      };
     }
 
     if (user.isVerified) {
@@ -181,9 +197,11 @@ export class AuthService {
       },
     });
 
-    await this.sendVerificationEmail(email, verificationToken);
+    this.sendVerificationEmail(email, verificationToken);
 
-    return { message: 'If the email exists, a verification link has been sent.' };
+    return {
+      message: 'If the email exists, a verification link has been sent.',
+    };
   }
 
   async forgotPassword(email: string) {
@@ -252,7 +270,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordMatches = await argon2.verify(user.passwordHash, loginDto.password);
+    const passwordMatches = await argon2.verify(
+      user.passwordHash,
+      loginDto.password,
+    );
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -269,6 +290,191 @@ export class AuthService {
       },
       ...tokens,
     };
+  }
+
+  async googleAuth(googleAuthDto: GoogleAuthDto) {
+    let decoded;
+
+    try {
+      decoded = await getAuth().verifyIdToken(googleAuthDto.idToken);
+    } catch {
+      throw new BadRequestException(
+        'Google sign-in token is invalid or expired. Please try again.',
+      );
+    }
+
+    const email = decoded.email?.toLowerCase();
+
+    if (!email) {
+      throw new BadRequestException(
+        'Google account must include a verified email address',
+      );
+    }
+
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ firebaseUid: decoded.uid }, { email }],
+      },
+      include: { profile: true },
+    });
+
+    if (existingUser) {
+      const user =
+        existingUser.firebaseUid === decoded.uid
+          ? existingUser
+          : await this.prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                firebaseUid: decoded.uid,
+                authProvider:
+                  existingUser.authProvider === 'EMAIL'
+                    ? 'EMAIL_GOOGLE'
+                    : existingUser.authProvider,
+                isVerified: true,
+              },
+              include: { profile: true },
+            });
+
+      const tokens = await this.getTokens(user.id, user.email, user.role);
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          firstName: user.profile?.firstName || '',
+          lastName: user.profile?.lastName || '',
+        },
+        ...tokens,
+      };
+    }
+
+    if (!googleAuthDto.role) {
+      return {
+        needsOnboarding: true,
+        googleProfile: this.getGoogleProfile(decoded),
+      };
+    }
+
+    this.validateGoogleCompletion(googleAuthDto);
+
+    const googleProfile = this.getGoogleProfile(decoded);
+    const firstName =
+      googleAuthDto.firstName?.trim() || googleProfile.firstName;
+    const lastName =
+      googleAuthDto.lastName?.trim() || googleProfile.lastName || 'User';
+    const passwordHash = await argon2.hash(
+      crypto.randomBytes(48).toString('hex'),
+    );
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        firebaseUid: decoded.uid,
+        authProvider: 'GOOGLE',
+        role: googleAuthDto.role,
+        isVerified: true,
+        profile: {
+          create: {
+            firstName,
+            lastName,
+            phone: googleAuthDto.phone || null,
+            address: googleAuthDto.address || null,
+            bio: googleAuthDto.bio || null,
+            dateOfBirth: googleAuthDto.dateOfBirth
+              ? new Date(googleAuthDto.dateOfBirth)
+              : null,
+            avatarUrl: googleProfile.avatarUrl,
+          },
+        },
+        ...(googleAuthDto.role === 'CUSTOMER' && {
+          customerProfile: {
+            create: {
+              careType: googleAuthDto.careType || null,
+              careFrequency: googleAuthDto.careFrequency || null,
+              specialRequirements: googleAuthDto.specialRequirements || null,
+              preferredSchedule: googleAuthDto.preferredSchedule || null,
+            },
+          },
+        }),
+        ...(googleAuthDto.role === 'CAREGIVER' && {
+          caregiverProfile: {
+            create: {
+              hourlyRate: googleAuthDto.hourlyRate || 0,
+              experienceYears: googleAuthDto.experienceYears || 0,
+              certifications: googleAuthDto.certifications || [],
+              specialties: googleAuthDto.specialties || [],
+              agreedToBackgroundCheck:
+                googleAuthDto.agreeToBackgroundCheck || false,
+              bio: googleAuthDto.bio || null,
+            },
+          },
+        }),
+      },
+      include: { profile: true },
+    });
+
+    const tokens = await this.getTokens(user.id, user.email, user.role);
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.profile?.firstName || '',
+        lastName: user.profile?.lastName || '',
+      },
+      ...tokens,
+      message: 'Google account connected successfully.',
+    };
+  }
+
+  private getGoogleProfile(decoded: { name?: string; picture?: string }) {
+    const [firstName = '', ...lastNameParts] = (decoded.name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    return {
+      firstName,
+      lastName: lastNameParts.join(' '),
+      avatarUrl: decoded.picture || null,
+    };
+  }
+
+  private validateGoogleCompletion(dto: GoogleAuthDto) {
+    if (!dto.firstName?.trim()) {
+      throw new BadRequestException('First name is required');
+    }
+    if (!dto.lastName?.trim()) {
+      throw new BadRequestException('Last name is required');
+    }
+    if (!dto.phone?.trim()) {
+      throw new BadRequestException('Phone number is required');
+    }
+
+    if (dto.role === 'CUSTOMER') {
+      if (!dto.careType) {
+        throw new BadRequestException('Care type is required');
+      }
+      if (!dto.careFrequency) {
+        throw new BadRequestException('Care frequency is required');
+      }
+    }
+
+    if (dto.role === 'CAREGIVER') {
+      if (!dto.specialties?.length) {
+        throw new BadRequestException('At least one specialty is required');
+      }
+      if (dto.experienceYears === undefined || dto.experienceYears < 0) {
+        throw new BadRequestException('Valid years of experience are required');
+      }
+      if (dto.hourlyRate === undefined || dto.hourlyRate <= 0) {
+        throw new BadRequestException('Valid hourly rate is required');
+      }
+      if (!dto.agreeToBackgroundCheck) {
+        throw new BadRequestException('Background check consent is required');
+      }
+    }
   }
 
   async refreshTokens(userId: string, email: string, role: string) {

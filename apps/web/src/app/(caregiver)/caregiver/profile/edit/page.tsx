@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
-import { User, Briefcase, Save, ArrowLeft, CheckCircle, AlertCircle, Camera, Upload, Image as ImageIcon } from "lucide-react";
+import { User, Briefcase, Save, ArrowLeft, CheckCircle, AlertCircle, Camera, Image as ImageIcon, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function CaregiverProfileEdit() {
@@ -107,28 +107,35 @@ export default function CaregiverProfileEdit() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-700"></div>
     </div>
   );
 
-  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white";
-  const labelClass = "block text-sm font-semibold text-gray-700 mb-2";
+  const inputClass = "caregiver-field";
+  const labelClass = "caregiver-label";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Link href="/caregiver/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-teal-600 mb-4 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
-          <p className="text-gray-500 mt-1">Update your personal and professional information</p>
+    <div className="caregiver-page space-y-8">
+      <section className="caregiver-hero">
+        <Link href="/caregiver/dashboard" className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-colors hover:text-white">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Link>
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-teal-50">
+              <BadgeCheck className="h-3.5 w-3.5" />
+              Professional profile
+            </div>
+            <h1 className="font-heading text-3xl text-white md:text-4xl">Edit Profile</h1>
+            <p className="mt-2 max-w-2xl text-sm text-white/75 md:text-base">Update the details customers see before they book your care services.</p>
+          </div>
         </div>
+      </section>
 
         {caregiverProfile.verificationStatus === 'PENDING' && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
             <div>
               <p className="font-medium text-amber-800">Verification Pending</p>
@@ -138,14 +145,14 @@ export default function CaregiverProfileEdit() {
         )}
 
         {saved && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 animate-in fade-in slide-in-from-top-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <p className="font-medium text-green-800">Profile saved successfully!</p>
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-          <div className="relative h-48 bg-gradient-to-r from-teal-200 to-cyan-200">
+        <div className="caregiver-panel overflow-hidden">
+          <div className="relative h-52 bg-gradient-to-r from-teal-200 to-cyan-200">
             {caregiverProfile.coverPhotoUrl ? (
               <img src={caregiverProfile.coverPhotoUrl} alt="Cover" className="w-full h-full object-cover" />
             ) : (
@@ -166,7 +173,7 @@ export default function CaregiverProfileEdit() {
               type="button"
               onClick={() => coverInputRef.current?.click()}
               disabled={uploadingCover}
-              className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              className="absolute bottom-4 right-4 z-10 flex items-center gap-2 rounded-lg bg-slate-950/70 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-950 disabled:opacity-50"
             >
               {uploadingCover ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -179,7 +186,7 @@ export default function CaregiverProfileEdit() {
 
           <div className="px-6 pb-6">
             <div className="relative -mt-16 mb-4">
-              <div className="w-32 h-32 rounded-2xl border-4 border-white bg-gradient-to-br from-teal-400 to-teal-600 shadow-lg overflow-hidden">
+              <div className="h-32 w-32 overflow-hidden rounded-lg border-4 border-white bg-gradient-to-br from-teal-400 to-teal-600 shadow-lg">
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -200,7 +207,7 @@ export default function CaregiverProfileEdit() {
               <button
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute bottom-0 right-0 w-10 h-10 bg-teal-600 hover:bg-teal-700 text-white rounded-xl flex items-center justify-center shadow-lg transition-colors"
+                className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-lg bg-teal-700 text-white shadow-lg transition-colors hover:bg-teal-800"
               >
                 {uploadingAvatar ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -211,19 +218,19 @@ export default function CaregiverProfileEdit() {
             </div>
             
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{profile.firstName} {profile.lastName}</h2>
+              <h2 className="font-heading text-2xl text-slate-950">{profile.firstName} {profile.lastName}</h2>
               <p className="text-gray-500">Caregiver</p>
             </div>
           </div>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+          <div className="caregiver-panel p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="caregiver-icon-box bg-blue-50">
                 <User className="w-5 h-5 text-blue-600" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
+              <h2 className="font-heading text-xl text-slate-950">Personal Information</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -257,12 +264,12 @@ export default function CaregiverProfileEdit() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+          <div className="caregiver-panel p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+              <div className="caregiver-icon-box bg-teal-50">
                 <Briefcase className="w-5 h-5 text-teal-600" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Professional Information</h2>
+              <h2 className="font-heading text-xl text-slate-950">Professional Information</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -289,11 +296,11 @@ export default function CaregiverProfileEdit() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <button 
               type="submit" 
               disabled={saving}
-              className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-200 hover:shadow-xl disabled:bg-teal-300"
+              className="caregiver-primary-button px-8 py-3 disabled:bg-teal-300"
             >
               {saving ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -304,13 +311,12 @@ export default function CaregiverProfileEdit() {
             </button>
             <Link 
               href="/caregiver/dashboard" 
-              className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+              className="caregiver-secondary-button px-8 py-3"
             >
               Cancel
             </Link>
           </div>
         </form>
-      </div>
     </div>
   );
 }

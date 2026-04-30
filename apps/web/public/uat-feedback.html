@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareSphere UAT Feedback</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-10 font-sans flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-5xl bg-white p-10 rounded-xl shadow-md border border-gray-200">
+        <div class="mb-8 border-b pb-4">
+            <h1 class="text-3xl font-bold text-gray-800">User Acceptance Testing (UAT) Feedback</h1>
+            <p class="text-gray-500 mt-2">Evaluation results across Customer, Caregiver, and Admin user groups.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+            <!-- Satisfaction Bar Chart -->
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Satisfaction Scores (out of 5)</h2>
+                <canvas id="satisfactionChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- Completion Rate Pie Chart -->
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col items-center">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Overall Task Completion Rate</h2>
+                <div class="relative w-64 h-64">
+                    <canvas id="completionChart"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-600 mt-4">94% of critical workflows were completed without assistance.</p>
+            </div>
+        </div>
+
+        <!-- Improvement Suggestions -->
+        <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+                <h2 class="text-lg font-bold text-blue-800">Key User Feedback & Improvement Suggestions</h2>
+            </div>
+            <ul class="divide-y divide-gray-200">
+                <li class="px-6 py-4 flex items-start">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded mr-3 mt-0.5">Caregiver</span>
+                    <span class="text-gray-700 text-sm">"The document vault is great, but adding bulk upload for certifications would save time."</span>
+                </li>
+                <li class="px-6 py-4 flex items-start">
+                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mr-3 mt-0.5">Customer</span>
+                    <span class="text-gray-700 text-sm">"Really loved the real-time chat. It would be nice to have unread message indicators more prominent."</span>
+                </li>
+                <li class="px-6 py-4 flex items-start">
+                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded mr-3 mt-0.5">Admin</span>
+                    <span class="text-gray-700 text-sm">"The dispute resolution dashboard is clear. Adding export to CSV for accounting records is requested."</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Satisfaction Chart (Bar)
+        const ctxSatisfaction = document.getElementById('satisfactionChart').getContext('2d');
+        new Chart(ctxSatisfaction, {
+            type: 'bar',
+            data: {
+                labels: ['Customers', 'Caregivers', 'Admins'],
+                datasets: [
+                    {
+                        label: 'Ease of Use',
+                        data: [4.6, 4.4, 4.8],
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Reliability',
+                        data: [4.8, 4.7, 4.9],
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 5,
+                        title: { display: true, text: 'Score' } 
+                    }
+                }
+            }
+        });
+
+        // Completion Rate Chart (Doughnut/Pie)
+        const ctxCompletion = document.getElementById('completionChart').getContext('2d');
+        new Chart(ctxCompletion, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed Independently', 'Required Assistance', 'Failed/Incomplete'],
+                datasets: [{
+                    data: [94, 5, 1],
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)', // Green
+                        'rgba(250, 204, 21, 0.8)', // Yellow
+                        'rgba(239, 68, 68, 0.8)'  // Red
+                    ],
+                    borderColor: [
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(250, 204, 21, 1)',
+                        'rgba(239, 68, 68, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '60%',
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

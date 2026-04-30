@@ -59,7 +59,7 @@ export default function ChatDirectPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 h-[calc(100vh-100px)] flex items-center justify-center">
+      <div className="caregiver-page flex h-[calc(100vh-100px)] items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
       </div>
     );
@@ -67,7 +67,7 @@ export default function ChatDirectPage() {
 
   if (error || !otherUser) {
     return (
-      <div className="container mx-auto p-4 h-[calc(100vh-100px)] flex items-center justify-center">
+      <div className="caregiver-page flex h-[calc(100vh-100px)] items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error || 'User not found'}</p>
           <Link href="/chat" className="text-teal-700 hover:underline">
@@ -79,17 +79,18 @@ export default function ChatDirectPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 h-[calc(100vh-100px)]">
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/chat" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+    <div className="caregiver-page flex h-[calc(100vh-120px)] min-h-[720px] flex-col gap-6">
+      <section className="caregiver-hero">
+        <Link href="/chat" className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-colors hover:text-white">
+          <ArrowLeft className="w-4 h-4" />
+          Back to conversations
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="font-heading text-3xl text-white md:text-4xl">
           Chat with {otherUser.profile.firstName} {otherUser.profile.lastName}
         </h1>
-      </div>
+      </section>
 
-      <div className="flex justify-center">
+      <div className="flex min-h-0 flex-1 justify-center">
         <ChatWindow
           currentUser={user}
           otherUser={{

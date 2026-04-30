@@ -3,12 +3,14 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { API_BASE_URL } from "@/lib/api";
+import { firebaseAuth, signInWithGoogle, splitDisplayName } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { HeartPulse, Check, ArrowRight, ArrowLeft, User, Shield, Clock, Briefcase } from "lucide-react";
+import { HeartPulse, Check, ArrowRight, ArrowLeft, User, Shield, Clock, Briefcase, Loader2, Sparkles } from "lucide-react";
 
 type UserRole = "CUSTOMER" | "CAREGIVER";
 
@@ -109,6 +111,8 @@ function RegisterContent() {
   const [role, setRole] = useState<UserRole>("CUSTOMER");
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGoogleMode, setIsGoogleMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stepErrors, setStepErrors] = useState<Record<number, string>>({});
 
@@ -151,9 +155,38 @@ function RegisterContent() {
     } else {
       setRole("CUSTOMER");
     }
+
+    const pendingGoogleUser = sessionStorage.getItem("pendingGoogleUser");
+    if (pendingGoogleUser) {
+      try {
+        const parsed = JSON.parse(pendingGoogleUser) as { email?: string; displayName?: string };
+        const { firstName, lastName } = splitDisplayName(parsed.displayName || "");
+        setIsGoogleMode(true);
+        setCustomerData((prev) => ({
+          ...prev,
+          email: parsed.email || prev.email,
+          firstName: firstName || prev.firstName,
+          lastName: lastName || prev.lastName,
+          password: "",
+          confirmPassword: "",
+        }));
+        setCaregiverData((prev) => ({
+          ...prev,
+          email: parsed.email || prev.email,
+          firstName: firstName || prev.firstName,
+          lastName: lastName || prev.lastName,
+          password: "",
+          confirmPassword: "",
+        }));
+      } catch {
+        sessionStorage.removeItem("pendingGoogleUser");
+      }
+    }
   }, [searchParams]);
 
   const steps = role === "CUSTOMER" ? STEPS_CUSTOMER : STEPS_CAREGIVER;
+  const googleButtonClass =
+    "w-full h-12 rounded-md border border-slate-200 bg-white !text-slate-950 shadow-sm hover:bg-slate-50 hover:border-slate-300 font-medium";
 
   const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -179,6 +212,50 @@ function RegisterContent() {
     setCaregiverData((prev) => ({ ...prev, specialties: updated.join(", ") }));
   };
 
+  const handleRoleChange = (nextRole: UserRole) => {
+    setRole(nextRole);
+    setCurrentStep(1);
+    setStepErrors({});
+    setError(null);
+  };
+
+  const hydrateGoogleUser = (googleUser: { email: string; displayName: string }) => {
+    const { firstName, lastName } = splitDisplayName(googleUser.displayName);
+    setIsGoogleMode(true);
+    setCustomerData((prev) => ({
+      ...prev,
+      email: googleUser.email,
+      firstName: firstName || prev.firstName,
+      lastName: lastName || prev.lastName,
+      password: "",
+      confirmPassword: "",
+    }));
+    setCaregiverData((prev) => ({
+      ...prev,
+      email: googleUser.email,
+      firstName: firstName || prev.firstName,
+      lastName: lastName || prev.lastName,
+      password: "",
+      confirmPassword: "",
+    }));
+  };
+
+  const handleGoogleStart = async () => {
+    setIsGoogleLoading(true);
+    setError(null);
+
+    try {
+      const googleUser = await signInWithGoogle();
+      sessionStorage.setItem("pendingGoogleUser", JSON.stringify(googleUser));
+      hydrateGoogleUser(googleUser);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Google sign-up failed";
+      setError(message);
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   const validateStep = (step: number): boolean => {
     setStepErrors({});
     const newErrors: Record<number, string> = {};
@@ -188,11 +265,13 @@ function RegisterContent() {
         if (!customerData.email || !customerData.email.includes("@")) {
           newErrors[1] = "Please enter a valid email address";
         }
-        if (!customerData.password || customerData.password.length < 8) {
-          newErrors[1] = "Password must be at least 8 characters";
-        }
-        if (customerData.password !== customerData.confirmPassword) {
-          newErrors[1] = "Passwords do not match";
+        if (!isGoogleMode) {
+          if (!customerData.password || customerData.password.length < 8) {
+            newErrors[1] = "Password must be at least 8 characters";
+          }
+          if (customerData.password !== customerData.confirmPassword) {
+            newErrors[1] = "Passwords do not match";
+          }
         }
       } else if (step === 2) {
         if (!customerData.firstName.trim()) {
@@ -217,11 +296,13 @@ function RegisterContent() {
         if (!caregiverData.email || !caregiverData.email.includes("@")) {
           newErrors[1] = "Please enter a valid email address";
         }
-        if (!caregiverData.password || caregiverData.password.length < 8) {
-          newErrors[1] = "Password must be at least 8 characters";
-        }
-        if (caregiverData.password !== caregiverData.confirmPassword) {
-          newErrors[1] = "Passwords do not match";
+        if (!isGoogleMode) {
+          if (!caregiverData.password || caregiverData.password.length < 8) {
+            newErrors[1] = "Password must be at least 8 characters";
+          }
+          if (caregiverData.password !== caregiverData.confirmPassword) {
+            newErrors[1] = "Passwords do not match";
+          }
         }
       } else if (step === 2) {
         if (!caregiverData.firstName.trim()) {
@@ -276,13 +357,16 @@ function RegisterContent() {
     try {
       let registrationData: Record<string, unknown> = {
         email: role === "CUSTOMER" ? customerData.email : caregiverData.email,
-        password: role === "CUSTOMER" ? customerData.password : caregiverData.password,
         role,
         firstName: role === "CUSTOMER" ? customerData.firstName : caregiverData.firstName,
         lastName: role === "CUSTOMER" ? customerData.lastName : caregiverData.lastName,
         phone: role === "CUSTOMER" ? customerData.phone : caregiverData.phone,
         address: role === "CUSTOMER" ? customerData.address : caregiverData.address,
       };
+
+      if (!isGoogleMode) {
+        registrationData.password = role === "CUSTOMER" ? customerData.password : caregiverData.password;
+      }
 
       if (role === "CUSTOMER") {
         registrationData = {
@@ -308,10 +392,27 @@ function RegisterContent() {
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean),
+          agreeToBackgroundCheck: caregiverData.agreeToBackgroundCheck,
         };
       }
 
-      const res = await fetch("http://localhost:4000/auth/register", {
+      let endpoint = `${API_BASE_URL}/auth/register`;
+
+      if (isGoogleMode) {
+        const idToken = await firebaseAuth.currentUser?.getIdToken(true);
+
+        if (!idToken) {
+          throw new Error("Please reconnect your Google account to finish sign-up");
+        }
+
+        endpoint = `${API_BASE_URL}/auth/google`;
+        registrationData = {
+          ...registrationData,
+          idToken,
+        };
+      }
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registrationData),
@@ -324,6 +425,7 @@ function RegisterContent() {
       }
 
       login(data.accessToken, data.refreshToken, data.user);
+      sessionStorage.removeItem("pendingGoogleUser");
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(message);
@@ -333,43 +435,58 @@ function RegisterContent() {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex items-start justify-between mb-14 w-full relative max-w-lg mx-auto">
-      {steps.map((step, index) => {
+    <div className="mb-12 w-full max-w-3xl mx-auto">
+      <div
+        className="relative grid items-start"
+        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+      >
+        <div
+          className="absolute top-[22px] h-0.5 rounded-full bg-white/10"
+          style={{
+            left: `${50 / steps.length}%`,
+            right: `${50 / steps.length}%`,
+          }}
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[#14b8a6] to-[#5eead4] transition-all duration-500"
+            style={{
+              width: `${steps.length > 1 ? ((currentStep - 1) / (steps.length - 1)) * 100 : 0}%`,
+            }}
+          />
+        </div>
+
+      {steps.map((step) => {
         const Icon = step.icon;
         const isActive = currentStep === step.id;
         const isCompleted = currentStep > step.id;
         return (
-          <div key={step.id} className="flex-1 flex flex-col items-center relative">
+          <div key={step.id} className="relative flex flex-col items-center">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all relative z-10 ${
+              className={`relative z-10 flex h-11 w-11 items-center justify-center rounded-full border transition-all duration-300 ${
                 isCompleted
-                  ? "bg-[#0d9488] text-white"
+                  ? "border-[#14b8a6] bg-[#0d9488] text-white shadow-lg shadow-teal-950/25"
                   : isActive
-                  ? "bg-[#0d9488] text-white ring-4 ring-[#0d9488]/20"
-                  : "bg-white/5 text-white/30"
+                  ? "border-[#5eead4] bg-[#0d9488] text-white shadow-lg shadow-teal-950/30 ring-4 ring-[#14b8a6]/20"
+                  : "border-white/12 bg-[#243142] text-white/40"
               }`}
             >
               {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
             </div>
             
             <span
-              className={`text-xs mt-2 font-medium text-center px-1 whitespace-nowrap absolute top-10 ${
+              className={`mt-3 hidden text-center text-xs font-medium transition-colors sm:block sm:text-sm ${
                 isActive ? "text-[#5eead4]" : isCompleted ? "text-white/70" : "text-white/30"
               }`}
             >
               {step.title}
             </span>
-
-            {index < steps.length - 1 && (
-              <div
-                className={`absolute top-5 left-[50%] w-full h-0.5 ${
-                  currentStep > step.id ? "bg-[#0d9488]" : "bg-white/10"
-                }`}
-              />
-            )}
           </div>
         );
       })}
+      </div>
+      <div className="mt-4 text-center text-sm font-medium text-[#5eead4] sm:hidden">
+        Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.title}
+      </div>
     </div>
   );
 
@@ -379,10 +496,37 @@ function RegisterContent() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Create Your Account</h2>
-              <p className="text-white/50 font-body">Join CareSphere to find the perfect caregiver</p>
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">
+                {isGoogleMode ? "Google account connected" : "Create Your Account"}
+              </h2>
+              <p className="text-white/50 font-body">
+                {isGoogleMode ? "Finish your care details to complete sign-up" : "Join CareSphere to find the perfect caregiver"}
+              </p>
             </div>
             <div className="space-y-5">
+              {!isGoogleMode && (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGoogleStart}
+                    disabled={isGoogleLoading}
+                    className={googleButtonClass}
+                  >
+                    {isGoogleLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin text-slate-950" />
+                    ) : (
+                      <span className="mr-2 grid h-6 w-6 place-items-center rounded-full border border-slate-200 bg-white text-sm font-bold text-[#4285f4]">G</span>
+                    )}
+                    Continue with Google
+                  </Button>
+                  <div className="flex items-center gap-4">
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-xs uppercase tracking-widest text-white/30">or use email</span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
+                </>
+              )}
               <div>
                 <Label htmlFor="email" className="text-white/70 text-sm font-body mb-2 block">Email Address</Label>
                 <Input
@@ -391,39 +535,42 @@ function RegisterContent() {
                   type="email"
                   value={customerData.email}
                   onChange={handleCustomerChange}
+                  disabled={isGoogleMode}
                   placeholder="you@example.com"
                   dark
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={customerData.password}
-                    onChange={handleCustomerChange}
-                    placeholder="Min. 8 characters"
-                    dark
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
-                  />
+              {!isGoogleMode && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      value={customerData.password}
+                      onChange={handleCustomerChange}
+                      placeholder="Min. 8 characters"
+                      dark
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      value={customerData.confirmPassword}
+                      onChange={handleCustomerChange}
+                      placeholder="Confirm password"
+                      dark
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    value={customerData.confirmPassword}
-                    onChange={handleCustomerChange}
-                    placeholder="Confirm password"
-                    dark
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
-                  />
-                </div>
-              </div>
+              )}
             </div>
           </div>
         );
@@ -641,10 +788,37 @@ function RegisterContent() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">Create Your Account</h2>
-              <p className="text-white/50 font-body">Join CareSphere as a caregiver</p>
+              <h2 className="font-heading text-2xl text-white mb-2 tracking-tight">
+                {isGoogleMode ? "Google account connected" : "Create Your Account"}
+              </h2>
+              <p className="text-white/50 font-body">
+                {isGoogleMode ? "Add your professional details before your profile is reviewed" : "Join CareSphere as a caregiver"}
+              </p>
             </div>
             <div className="space-y-5">
+              {!isGoogleMode && (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGoogleStart}
+                    disabled={isGoogleLoading}
+                    className={googleButtonClass}
+                  >
+                    {isGoogleLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin text-slate-950" />
+                    ) : (
+                      <span className="mr-2 grid h-6 w-6 place-items-center rounded-full border border-slate-200 bg-white text-sm font-bold text-[#4285f4]">G</span>
+                    )}
+                    Continue with Google
+                  </Button>
+                  <div className="flex items-center gap-4">
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-xs uppercase tracking-widest text-white/30">or use email</span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
+                </>
+              )}
               <div>
                 <Label htmlFor="email" className="text-white/70 text-sm font-body mb-2 block">Email Address</Label>
                 <Input
@@ -653,39 +827,42 @@ function RegisterContent() {
                   type="email"
                   value={caregiverData.email}
                   onChange={handleCaregiverChange}
+                  disabled={isGoogleMode}
                   placeholder="you@example.com"
                   dark
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={caregiverData.password}
-                    onChange={handleCaregiverChange}
-                    placeholder="Min. 8 characters"
-                    dark
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
-                  />
+              {!isGoogleMode && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="password" className="text-white/70 text-sm font-body mb-2 block">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      value={caregiverData.password}
+                      onChange={handleCaregiverChange}
+                      placeholder="Min. 8 characters"
+                      dark
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      value={caregiverData.confirmPassword}
+                      onChange={handleCaregiverChange}
+                      placeholder="Confirm password"
+                      dark
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="confirmPassword" className="text-white/70 text-sm font-body mb-2 block">Confirm</Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    value={caregiverData.confirmPassword}
-                    onChange={handleCaregiverChange}
-                    placeholder="Confirm password"
-                    dark
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-sm"
-                  />
-                </div>
-              </div>
+              )}
             </div>
           </div>
         );
@@ -985,19 +1162,94 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] overflow-y-auto">
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen overflow-y-auto bg-[#0b1220] text-white">
+      <div className="fixed inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-10"
+          style={{ backgroundImage: "url(/media/images/landing-family.jpg)" }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(20,184,166,0.24),transparent_32%),linear-gradient(135deg,rgba(15,23,42,0.98),rgba(15,23,42,0.9)_48%,rgba(15,118,110,0.5))]" />
+      </div>
+
+      <div className="relative z-10 min-h-screen px-4 py-8 sm:px-6 lg:px-10">
+        <div className="mx-auto mb-8 flex w-full max-w-6xl items-center justify-between">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm font-body text-white/55 hover:text-white transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Back to home
+          </Link>
+          <Link href="/login" className="text-sm font-body text-white/55 hover:text-[#5eead4] transition-colors">
+            Sign in
+          </Link>
+        </div>
+
+        <div className="mx-auto grid w-full max-w-6xl items-start gap-8 lg:grid-cols-[0.82fr_1.18fr]">
+          <motion.aside
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.55 }}
+            className="hidden lg:block sticky top-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.055] p-8 shadow-2xl shadow-black/25 backdrop-blur-xl"
+          >
+            <div className="mb-10 flex items-center gap-3">
+              <img src="/logo.png" alt="CareSphere" className="h-12 w-auto brightness-0 invert" />
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-teal-100">
+              <Sparkles className="h-3.5 w-3.5" />
+              Simple onboarding
+            </span>
+            <h1 className="mt-6 font-heading text-4xl leading-tight tracking-tight text-white">
+              Start with care that feels personal from the first step.
+            </h1>
+            <p className="mt-5 max-w-sm text-sm leading-7 text-white/60">
+              Create your profile, tell us what kind of support you need, and CareSphere will help match you with trusted caregivers.
+            </p>
+            <div className="mt-10 space-y-4">
+              {[
+                "Verified caregiver network",
+                "Care preferences saved securely",
+                "Fast matching after signup",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+                  <Check className="h-4 w-4 text-[#5eead4]" />
+                  <span className="text-sm text-white/75">{item}</span>
+                </div>
+              ))}
+            </div>
+          </motion.aside>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inner-card p-8 md:p-10 w-full max-w-2xl"
+          className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.07] p-5 shadow-2xl shadow-black/25 backdrop-blur-2xl sm:p-7 md:p-9"
         >
-          <div className="mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 text-sm font-body text-white/40 hover:text-white transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
+          <div className="mb-8 lg:hidden">
+            <img src="/logo.png" alt="CareSphere" className="h-11 w-auto brightness-0 invert" />
           </div>
+
+          <div className="mb-8">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#5eead4]">Create account</span>
+            <h2 className="mt-3 font-heading text-3xl tracking-tight text-white">Choose your path</h2>
+            <p className="mt-2 text-sm text-white/55">
+              {role === "CUSTOMER" ? "Find dependable care for someone you love." : "Build a trusted caregiver profile families can discover."}
+            </p>
+          </div>
+
+          <div className="mb-8 grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-black/15 p-1.5">
+            {(["CUSTOMER", "CAREGIVER"] as UserRole[]).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => handleRoleChange(option)}
+                className={`h-12 rounded-lg text-sm font-medium transition-all ${
+                  role === option
+                    ? "bg-white text-slate-950 shadow-sm"
+                    : "text-white/55 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {option === "CUSTOMER" ? "Find care" : "Become a caregiver"}
+              </button>
+            ))}
+          </div>
+
           {renderStepIndicator()}
 
           {error && (
@@ -1016,9 +1268,9 @@ function RegisterContent() {
             {role === "CUSTOMER" ? renderCustomerStep() : renderCaregiverStep()}
           </div>
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-white/5">
+          <div className="flex justify-between mt-8 pt-6 border-t border-white/10">
             {currentStep > 1 ? (
-              <Button type="button" variant="outline" onClick={prevStep} className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-sm">
+              <Button type="button" variant="outline" onClick={prevStep} className="border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/10 hover:text-white rounded-md">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
@@ -1026,12 +1278,12 @@ function RegisterContent() {
               <div />
             )}
             {currentStep < steps.length ? (
-              <Button type="button" onClick={nextStep} className="bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488]">
+              <Button type="button" onClick={nextStep} className="rounded-md bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488] shadow-lg shadow-teal-950/25">
                 Continue
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button type="button" onClick={handleSubmit} disabled={isLoading} className="bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488]">
+              <Button type="button" onClick={handleSubmit} disabled={isLoading} className="rounded-md bg-[#0d9488] hover:bg-[#0f766e] text-white border-[#0d9488] shadow-lg shadow-teal-950/25">
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             )}
@@ -1044,6 +1296,7 @@ function RegisterContent() {
             </Link>
           </div>
         </motion.div>
+        </div>
       </div>
     </div>
   );
